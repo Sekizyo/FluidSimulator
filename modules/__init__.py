@@ -3,5 +3,6 @@ HEIGHT = 500
 
 
 def run():
-    from modules.main import run as mainRun
-    mainRun()
+    from modules.game import Game
+    game = Game()
+    game.run()

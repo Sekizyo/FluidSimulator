@@ -5,6 +5,7 @@ class Balls():
     def __init__(self):
         self.ballCount = 0
         self.balls = []
+        # self.createBall()
 
     def createBalls(self, count=1):
         for _ in range(count):
@@ -14,14 +15,14 @@ class Balls():
         self.balls.append(Ball())
         self.ballCount += 1
 
-    def draw(self):
-        for ball in balls:
-            ball.draw()
+    def render(self, surface):
+        for ball in self.balls:
+            ball.render(surface)
 
 class Ball(Balls):
     def __init__(self):
-        self.x = 0
-        self.y = 0
+        self.x = 100
+        self.y = 100
         self.radius = 1
         self.color = "red"
     
@@ -40,5 +41,5 @@ class Ball(Balls):
             self.y = y
 
 
-    def draw(self, surface):
+    def render(self, surface):
         pygame.draw.circle(surface, self.color, (self.x, self.y), self.radius)
