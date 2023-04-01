@@ -6,18 +6,19 @@ class Balls():
         self.ballCount = 0
         self.balls = []
 
-    def createBalls(self, count):
+    def createBalls(self, count=1):
         for _ in range(count):
-            createBall()
+            self.createBall()
 
     def createBall(self):
         self.balls.append(Ball())
+        self.ballCount += 1
 
     def draw(self):
-        for ball in balls():
+        for ball in balls:
             ball.draw()
 
-class Ball():
+class Ball(Balls):
     def __init__(self):
         self.x = 0
         self.y = 0
