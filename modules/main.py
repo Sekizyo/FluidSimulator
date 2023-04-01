@@ -1,13 +1,8 @@
 
 import pygame
-  
-pygame.init()
-  
-# CREATING CANVAS
-canvas = pygame.display.set_mode((500, 500))
-  
-# TITLE OF CANVAS
-pygame.display.set_caption("My Board")
+from modules.screen import Screen
+
+screen = Screen()
 exit = False
 
 def controls():
@@ -15,10 +10,15 @@ def controls():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit = True
+        if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
+            exit = True
 
+def draw():
+
+    pygame.display.update()
 
 def run():
     global exit
     while not exit:
         controls()
-        pygame.display.update()
+        draw()
