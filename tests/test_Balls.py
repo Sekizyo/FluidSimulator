@@ -15,6 +15,14 @@ def test_createBalls():
     assert len(balls.balls) == 5
     assert balls.ballCount == 5
 
+def test_clearBalls():
+    balls = Balls()
+    balls.createBall()
+    balls.clearBalls()
+
+    assert len(balls.balls) == 0
+    assert balls.ballCount == 0
+
 def test_createBallsNoArgument():
     balls = Balls()
     balls.createBalls()

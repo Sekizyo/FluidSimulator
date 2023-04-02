@@ -15,6 +15,10 @@ class Balls():
         self.balls.append(Ball())
         self.ballCount += 1
 
+    def clearBalls(self):
+        self.balls.clear()
+        self.ballCount = 0
+
     def render(self, surface):
         for ball in self.balls:
             ball.render(surface)
