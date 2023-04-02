@@ -28,8 +28,30 @@ class Ball(Balls):
         self.x = 100
         self.y = 100
         self.radius = 1
+        self.direction = 0
+        self.speed = 0
+        self._speedLimit = 250
         self.color = "red"
-    
+
+    def setDirection(self, amount=0):
+        newDirection = self.direction + amount
+        if newDirection > 360:
+            self.direction = newDirection - 360
+        elif newDirection < 0:
+            self.direction = 0
+        else:
+            self.direction = newDirection
+
+    def changeSpeed(self, amount=0):
+        newSpeed = self.speed + amount
+        if newSpeed > self._speedLimit:
+            self.speed = self._speedLimit
+        elif newSpeed < 0:
+            print("a")
+            self.speed = 0
+        else:
+            self.speed = newSpeed
+        
     def moveTo(self, x, y):
         global WIDTH
         global HEIGHT
