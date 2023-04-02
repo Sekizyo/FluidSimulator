@@ -10,27 +10,27 @@ def test_moveTo():
 
 def test_setDirection():
     ball = Ball()
-    ball.setDirection(80)
+    ball.setDirection(0.5, 0.5)
 
-    assert ball.direction == 80
+    assert ball.direction == [0.5, 0.5]
 
 def test_setDirectionNoParameters():
     ball = Ball()
     ball.setDirection()
 
-    assert ball.direction == 0
+    assert ball.direction == [0, 0]
 
-def test_setDirectionOver360():
+def test_setDirectionNotNormalized():
     ball = Ball()
-    ball.setDirection(370)
+    ball.setDirection(10, 10)
 
-    assert ball.direction == 10
+    assert ball.direction == [1, 1]
 
 def test_setDirectionNegative():
     ball = Ball()
-    ball.setDirection(-10)
+    ball.setDirection(-10, -10)
 
-    assert ball.direction == 0
+    assert ball.direction == [-1, -1]
 
 def test_changeSpeed():
     ball = Ball()
@@ -45,20 +45,20 @@ def test_changeSpeedNoParameters():
 def test_changeSpeedOverLimit():
     ball = Ball()
     ball.changeSpeed(350)
-    assert ball.speed == 250
+    assert ball.speed == 10
 
 def test_changeSpeedNegativeValue():
     ball = Ball()
     ball.changeSpeed(-10)
     assert ball.speed == 0
 
-def test_moveToBeyondScreenSize():
+def test_moveToUnderScreenSize():
     ball = Ball()
     ball.moveTo(WIDTH+1, HEIGHT+1)
     assert ball.x == WIDTH
     assert ball.y == HEIGHT
 
-def test_moveToUnderScreenSize():
+def test_moveToBeyondScreenSize():
     ball = Ball()
     ball.moveTo(-1, -1)
     assert ball.x == 0
