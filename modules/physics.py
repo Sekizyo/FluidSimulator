@@ -12,11 +12,27 @@ class Physics():
     
     def gravityForBalls(self, balls):
         for ball in balls.balls:
+            self.checkColisions(ball, balls.balls)
             self.gravity(ball)
 
     def gravity(self, ball):
-        self.calcMovement(ball)
         self.checkBoundries(ball)
+        self.calcMovement(ball)
+
+    def checkColisions(self, ballMain,  balls):
+        for ball in balls:
+            if ballMain.id != ball.id:
+                ballMain.position = self.vec(round(ballMain.position.x), round(ballMain.position.y))
+                ball.position = self.vec(round(ball.position.x), round(ball.position.y))
+
+                if ballMain.position.distance_to(ball.position) < ballMain.radius*2-2:
+                    print(f"Colision! between {ballMain.id} and {ball.id}")
+
+                    nv = ball.position-ballMain.position
+                    print(f"nv: {nv} ballMD: {ballMain.direction} ND: {ballMain.position.reflect(nv)}")
+
+                    ballMain.direction = ballMain.position.reflect_ip(nv)
+                    ball.direction = ball.position.reflect_ip(nv)
 
     def calcMovement(self, ball):
         ball.acceleration = ball.vec(ball.direction.x, self.gravityForce)

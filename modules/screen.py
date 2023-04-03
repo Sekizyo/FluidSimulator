@@ -8,4 +8,5 @@ class Screen():
         self.height = HEIGHT
         self.surface = pygame.display.set_mode((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
+        self.rectArea = self.surface.get_rect().inflate(-40, -40)
         # self.font = pygame.font.SysFont("arial.ttf", 30)

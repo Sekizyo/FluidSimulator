@@ -1,16 +1,16 @@
 
 import pygame
 from modules.screen import Screen
-from modules.ball import Balls
+from modules.particles import Particles
 from modules.physics import Physics
 
 class Game():
     def __init__(self):
         self.screen = Screen()
-        self.physics = Physics()
-        self.balls = Balls()
+        self.particles = Particles()
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("Arial", 18)
+        self.rectArea = self.screen.rectArea
         self.exit = False
     
     def controls(self):
@@ -20,8 +20,7 @@ class Game():
             if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
                 self.exit = True
             if pygame.key.get_pressed()[pygame.K_1] == True:
-                self.balls.clearBalls()
-                self.balls.createBallsRandom(10)
+                self.particles.create(1, self.rectArea)
 
     def updateFps(self):
         fps = str(int(self.clock.get_fps()))
@@ -31,13 +30,17 @@ class Game():
     def render(self):
         self.screen.surface.fill("black")
         self.updateFps()
-        self.balls.render(self.screen.surface)
-        pygame.display.update()
+
+        self.particles.move()
+        self.particles.colision()
+        self.particles.update(self.rectArea)
+        self.particles.draw(self.screen.surface)
+
+        pygame.display.flip()
 
     def run(self):
-        self.balls.createBallsRandom(10000)
+        self.particles.create(1, self.rectArea)
         while not self.exit:
             self.clock.tick(60)
             self.controls()
-            self.physics.gravityForBalls(self.balls)
             self.render()
