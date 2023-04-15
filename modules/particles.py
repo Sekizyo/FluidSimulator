@@ -6,7 +6,8 @@ class Particles():
     def __init__(self):
         self.particleCount = 0
         self.particles = pygame.sprite.Group()
-    
+        self.grid = []
+
     def create(self, amount, rectArea):
         self.particleCount += 1
         hue = randrange(360)
@@ -16,7 +17,7 @@ class Particles():
             x = randrange(pos_rect.left, pos_rect.right)
             y = randrange(pos_rect.top, pos_rect.bottom)
             dir = pygame.math.Vector2(1, 0).rotate(randrange(360))
-            particle = Particle(hue, (x, y), radius, dir, velocity)
+            particle = Particle(len(self.particles)+1, hue, (x, y), radius, dir, velocity)
             self.particles.add(particle)
 
     def draw(self, surface):
@@ -49,8 +50,9 @@ class Particles():
         self.particles.update(rectArea)
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, hue, pos, radius, dir, vel):
+    def __init__(self,id, hue, pos, radius, dir, vel):
         super().__init__()
+        self.id = id
         self.pos = pygame.math.Vector2(pos)
         self.dir = pygame.math.Vector2(dir)
         self.vel = vel
