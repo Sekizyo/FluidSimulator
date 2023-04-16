@@ -53,25 +53,25 @@ class Grid():
     def getNeighbourBlocks(self, block):
         x, y = block.gridPos
         neighbours = [(x-1,y), (x+1, y), (x, y-1), (x, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1)]
+        neighboursCopy = neighbours.copy()
         for neighbour in neighbours:
             neighbourX, neighbourY = neighbour
-            if neighbourX < 0 or neighbourY < 0:  
-                neighbours.remove(neighbour)
+            if neighbourX < 0 or neighbourY < 0 or neighbourX > self.widthBlocks or neighbourY > self.heightBlocks: 
+                neighboursCopy.remove(neighbour)
                 continue
 
             try:
                 newBlock = self.blocks[neighbourY][neighbourX]
                 newBlock.highlight = True
-
             except Exception as e:
-                neighbours.remove(neighbour)
+                neighboursCopy.remove(neighbour)
 
-        return neighbours
+        return neighboursCopy
 
     def getPossibleMovesByPosition(self, position):
         block = self.getBlockByPosition(position)
         moves = self.getNeighbourBlocks(block)
-        print(moves)
+        print(len(moves), moves)
         return moves
 
     def getBlockByPosition(self, position):
@@ -105,7 +105,7 @@ class Block():
 
     def render(self, surface):
         if self.highlight:
-            pygame.draw.rect(surface, (200,100,250), self.rect, 1)
+            pygame.draw.rect(surface, (255,255,250), self.rect, 1)
         else:
             pygame.draw.rect(surface, self.color, self.rect, 1)
         idText = self.font.render(str(self.gridPos), 1, self.color)
