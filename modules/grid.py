@@ -6,7 +6,7 @@ class Grid():
 
         self.width = WIDTH
         self.height = HEIGHT
-        self.blockSize = 100
+        self.blockSize = 125
         self.widthBlocks = self.width//self.blockSize
         self.heightBlocks = self.height//self.blockSize
         
@@ -39,40 +39,54 @@ class Grid():
             tempY.append(tempX)
         self.blocks = tempY
 
-    def getBlockByCords(self, x, y):
-        try:
-            return self.blocks[y][x]
-        except Exception:
-            return None
-
     def tempClearHighlight(self):
         for col in self.blocks:
             for block in col:
                 block.highlight = False
 
+    def tempClearBlockID(self):
+        for col in self.blocks:
+            for block in col:
+                block.particleID = None
+
+    def getBlockByGridPos(self, x, y):
+        if x < 0 or y < 0 or x >= self.widthBlocks or y >= self.heightBlocks: 
+            return None
+        return self.blocks[y][x]
+            
     def getNeighbourBlocks(self, block):
         x, y = block.gridPos
         neighbours = [(x-1,y), (x+1, y), (x, y-1), (x, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1)]
         neighboursCopy = neighbours.copy()
+
         for neighbour in neighbours:
             neighbourX, neighbourY = neighbour
-            if neighbourX < 0 or neighbourY < 0 or neighbourX > self.widthBlocks or neighbourY > self.heightBlocks: 
-                neighboursCopy.remove(neighbour)
-                continue
+            newBlock = self.getBlockByGridPos(neighbourX, neighbourY)
 
-            try:
+            if newBlock:
                 newBlock = self.blocks[neighbourY][neighbourX]
                 newBlock.highlight = True
-            except Exception as e:
+            else:
                 neighboursCopy.remove(neighbour)
 
         return neighboursCopy
 
+    def getFreeMovesFromMoves(self, moves):
+        movesCopy = moves.copy()
+        for move in moves:
+            x, y = move
+            block = self.blocks[y][x]
+            if block.particleID:
+                movesCopy.remove(move)
+
+        return movesCopy
+
     def getPossibleMovesByPosition(self, position):
         block = self.getBlockByPosition(position)
         moves = self.getNeighbourBlocks(block)
-        print(len(moves), moves)
-        return moves
+        possibleMoves = self.getFreeMovesFromMoves(moves)
+        print(block.gridPos, len(possibleMoves), possibleMoves)
+        return possibleMoves
 
     def getBlockByPosition(self, position):
         for col in self.blocks:
@@ -82,32 +96,49 @@ class Grid():
                         return block
 
     def assignParticleToBlock(self, particle):
-        self.tempClearHighlight()
         block = self.getBlockByPosition(particle.pos)
-        self.getPossibleMovesByPosition(particle.pos)
         block.particleID = particle.id
+        block.highlightColor = particle.color
             
     def assignParticlesToBlocks(self, particles):
         for particle in particles:
             self.assignParticleToBlock(particle)
+    
+    def moveParticle(self, particle, moves):
+        for move in moves:
+            particle.gridPos = move
+            particle.
+            return
+            
+    def refreshParticleAssigment(self, particles):
+        self.tempClearHighlight()
+        self.tempClearBlockID()
+        self.assignParticlesToBlocks(particles)
 
+    def moveParticles(self, particles):
+        self.refreshParticleAssigment(particles)
+        for particle in particles:
+            moves = self.getPossibleMovesByPosition(particle.pos)
+            self.moveParticle(particle, moves)
 
 class Block():
     def __init__(self, id=0, x=0, y=0, size=1):
         self.id = id
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
-        self.color = (x*5,y*5,255)
+        self.color = (255,255,255)
         self.highlight = False
+        self.highlightColor = (255, 255, 255)
         self.size = size
         self.particleID = None
         self.font = pygame.font.SysFont("Arial", 18)
 
     def render(self, surface):
         if self.highlight:
-            pygame.draw.rect(surface, (255,255,250), self.rect, 1)
+            pygame.draw.rect(surface, self.highlightColor, self.rect, 1)
         else:
             pygame.draw.rect(surface, self.color, self.rect, 1)
+        
         idText = self.font.render(str(self.gridPos), 1, self.color)
         pygame.Surface.blit(surface, idText, (self.rect[0]+(self.size//2), self.rect[1]+(self.size//2-10)))
         
