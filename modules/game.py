@@ -22,8 +22,8 @@ class Game():
             self.stopRender = True
 
     def reset(self):
-        self.particles.particles = pygame.sprite.Group()
-        self.particles.create(1, self.rectArea)
+        self.particles.particles = []
+        self.particles.create(1)
 
     def controls(self):
         for event in pygame.event.get():
@@ -32,7 +32,7 @@ class Game():
             if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
                 self.exit = True
             if pygame.key.get_pressed()[pygame.K_1] == True:
-                self.particles.create(1, self.rectArea)
+                self.particles.create(1)
             if pygame.key.get_pressed()[pygame.K_2] == True:
                 self.grid.switchRenderBlocks()
             if pygame.key.get_pressed()[pygame.K_SPACE] == True:
@@ -57,16 +57,13 @@ class Game():
         self.updateParticleCount()
 
         self.grid.moveParticles(self.particles.particles)
-
-        self.particles.update(self.screen.surface)
-        self.particles.draw(self.screen.surface)
         self.grid.render()
 
         pygame.display.flip()
 
     def run(self):
-        self.particles.create(1, self.rectArea)
+        self.particles.create(1)
         while not self.exit:
-            self.clock.tick(60)
+            self.clock.tick(10)
             self.controls()
             self.render()

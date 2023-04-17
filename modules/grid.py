@@ -1,14 +1,12 @@
 import pygame
-from modules import WIDTH, HEIGHT
+from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
 class Grid():
     def __init__(self, surface):
         self.surface = surface
 
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.blockSize = 125
-        self.widthBlocks = self.width//self.blockSize
-        self.heightBlocks = self.height//self.blockSize
+        self.blockSize = BLOCKSIZE
+        self.widthBlocks = WIDTHBLOCKS
+        self.heightBlocks = HEIGHTBLOCKS
         
         self.renderBlocks = True
         self.blocksCount = 0
@@ -49,7 +47,8 @@ class Grid():
             for block in col:
                 block.particleID = None
 
-    def getBlockByGridPos(self, x, y):
+    def getBlockByGridPos(self, pos):
+        x, y = pos
         if x < 0 or y < 0 or x >= self.widthBlocks or y >= self.heightBlocks: 
             return None
         return self.blocks[y][x]
@@ -61,11 +60,10 @@ class Grid():
 
         for neighbour in neighbours:
             neighbourX, neighbourY = neighbour
-            newBlock = self.getBlockByGridPos(neighbourX, neighbourY)
+            newBlock = self.getBlockByGridPos(neighbour)
 
             if newBlock:
                 newBlock = self.blocks[neighbourY][neighbourX]
-                newBlock.highlight = True
             else:
                 neighboursCopy.remove(neighbour)
 
@@ -82,34 +80,39 @@ class Grid():
         return movesCopy
 
     def getPossibleMovesByPosition(self, position):
-        block = self.getBlockByPosition(position)
+        block = self.getBlockByGridPos(position)
         moves = self.getNeighbourBlocks(block)
         possibleMoves = self.getFreeMovesFromMoves(moves)
-        print(block.gridPos, len(possibleMoves), possibleMoves)
         return possibleMoves
 
-    def getBlockByPosition(self, position):
-        for col in self.blocks:
-            for block in col:
-                if block.rect[0] <= position.x <= block.rect[0]+self.blockSize:
-                    if block.rect[1] <= position.y <= block.rect[1]+self.blockSize:
-                        return block
-
     def assignParticleToBlock(self, particle):
-        block = self.getBlockByPosition(particle.pos)
+        block = self.getBlockByGridPos(particle.gridPos)
         block.particleID = particle.id
-        block.highlightColor = particle.color
             
     def assignParticlesToBlocks(self, particles):
         for particle in particles:
             self.assignParticleToBlock(particle)
     
     def moveParticle(self, particle, moves):
-        for move in moves:
-            particle.gridPos = move
-            particle.
-            return
-            
+        print(particle.id, particle.gridPos, particle.dir, moves)
+        particle.dir[1] += 1
+        testX = particle.gridPos[0] + particle.dir[0]
+        testY = particle.gridPos[1] + particle.dir[1]
+        testMove = (testX, testY)
+        testMoveRev = (-testX, -testY)
+        if testMove in moves:
+            print(testMove)
+            particle.move()
+            print("Foubd1")
+        elif testMoveRev in moves:
+            particle.move()
+            print(testMoveRev)
+            print("Foubd2")
+        else:
+            print("Not Found")
+
+        particle.dir[1] = 0
+
     def refreshParticleAssigment(self, particles):
         self.tempClearHighlight()
         self.tempClearBlockID()
@@ -118,7 +121,7 @@ class Grid():
     def moveParticles(self, particles):
         self.refreshParticleAssigment(particles)
         for particle in particles:
-            moves = self.getPossibleMovesByPosition(particle.pos)
+            moves = self.getPossibleMovesByPosition(particle.gridPos)
             self.moveParticle(particle, moves)
 
 class Block():
@@ -136,6 +139,8 @@ class Block():
     def render(self, surface):
         if self.highlight:
             pygame.draw.rect(surface, self.highlightColor, self.rect, 1)
+        elif self.particleID:
+            pygame.draw.rect(surface, (100,100,100), self.rect, 0)
         else:
             pygame.draw.rect(surface, self.color, self.rect, 1)
         
