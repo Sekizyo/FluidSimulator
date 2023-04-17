@@ -1,5 +1,5 @@
 import pygame
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
+from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
 class Grid():
     def __init__(self, surface):
         self.surface = surface
@@ -8,7 +8,7 @@ class Grid():
         self.widthBlocks = WIDTHBLOCKS
         self.heightBlocks = HEIGHTBLOCKS
         
-        self.renderDebug = True
+        self.renderDebug = False
         self.blocksCount = 0
         self.blocks = []
         self.createBlocks()
@@ -93,22 +93,15 @@ class Grid():
             self.assignParticleToBlock(particle)
     
     def moveParticle(self, particle, moves):
-        print(particle.id, particle.gridPos, particle.dir, moves)
         particle.dir[1] += 1
         testX = particle.gridPos[0] + particle.dir[0]
         testY = particle.gridPos[1] + particle.dir[1]
         testMove = (testX, testY)
         testMoveRev = (-testX, -testY)
         if testMove in moves:
-            print(testMove)
             particle.move()
-            print("Foubd1")
         elif testMoveRev in moves:
             particle.move()
-            print(testMoveRev)
-            print("Foubd2")
-        else:
-            print("Not Found")
 
         particle.dir[1] = 0
 
@@ -129,11 +122,8 @@ class Block():
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
         self.color = (255,255,255)
-        self.highlight = False
-        self.highlightColor = (255, 255, 255)
         self.size = size
         self.particleID = None
-        self.font = pygame.font.SysFont("Arial", 18)
 
     def render(self, surface, debug=False):
         if self.particleID:
@@ -141,10 +131,10 @@ class Block():
         elif debug:
             pygame.draw.rect(surface, self.color, self.rect, 1)
         
-            idText = self.font.render(str(self.gridPos), 1, self.color)
+            idText = FONT.render(str(self.gridPos), 1, self.color)
             pygame.Surface.blit(surface, idText, (self.rect[0]+(self.size//2), self.rect[1]+(self.size//2-10)))
             
-            particleIDText = self.font.render(str(self.particleID), 1, (255,255,255))
+            particleIDText = FONT.render(str(self.particleID), 1, (255,255,255))
             pygame.Surface.blit(surface, particleIDText, (self.rect[0]+(self.size//2), self.rect[1]+(self.size//2+10)))
         
     

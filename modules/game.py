@@ -1,5 +1,6 @@
 
 import pygame
+from modules import STRESTEST, FONT
 from modules.screen import Screen
 from modules.particles import Particles
 from modules.grid import Grid
@@ -7,10 +8,10 @@ from modules.grid import Grid
 class Game():
     def __init__(self):
         self.screen = Screen()
+        self.fps = 10
         self.grid = Grid(self.screen.surface)
         self.particles = Particles()
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont("Arial", 18)
         self.rectArea = self.screen.rectArea
         self.stopRender = False
         self.exit = False
@@ -23,7 +24,13 @@ class Game():
 
     def reset(self):
         self.particles.particles = []
+        self.particles.particleCount = 0
         self.particles.create(1)
+
+    def stresTest(self):
+        if STRESTEST:
+            self.fps = 60
+            self.particles.create(1)
 
     def controls(self):
         for event in pygame.event.get():
@@ -42,11 +49,11 @@ class Game():
 
     def updateFps(self):
         fps = str(int(self.clock.get_fps()))
-        fps_text = self.font.render(fps, 1, pygame.Color("coral"))
+        fps_text = FONT.render(fps, 1, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCount(self):
-        particleText = self.font.render(str(self.particles.particleCount), 1, pygame.Color("coral"))
+        particleText = FONT.render(str(self.particles.particleCount), 1, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (30,0))
 
     def render(self):
@@ -64,6 +71,7 @@ class Game():
     def run(self):
         self.particles.create(1)
         while not self.exit:
-            self.clock.tick(10)
+            self.clock.tick(self.fps)
+            self.stresTest()
             self.controls()
             self.render()
