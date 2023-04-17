@@ -34,7 +34,7 @@ class Game():
             if pygame.key.get_pressed()[pygame.K_1] == True:
                 self.particles.create(1)
             if pygame.key.get_pressed()[pygame.K_2] == True:
-                self.grid.switchRenderBlocks()
+                self.grid.switchRenderDebug()
             if pygame.key.get_pressed()[pygame.K_SPACE] == True:
                 self.switchStopRender()
             if pygame.key.get_pressed()[pygame.K_r] == True:
