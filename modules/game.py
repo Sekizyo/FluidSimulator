@@ -56,13 +56,10 @@ class Game():
         self.updateFps()
         self.updateParticleCount()
 
-        self.grid.assignParticlesToBlocks(self.particles.particles)
+        self.grid.moveParticles(self.particles.particles)
 
-        self.particles.move()
-        self.particles.colision()
-        self.particles.update(self.rectArea)
+        self.particles.update(self.screen.surface)
         self.particles.draw(self.screen.surface)
-
         self.grid.render()
 
         pygame.display.flip()
