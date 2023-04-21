@@ -12,7 +12,7 @@ class Particles():
 
         for i in range(amount):
             gridPos = [randrange(0,WIDTHBLOCKS), randrange(0,2)]
-            dir = [randrange(-1, 1), randrange(-1, 1)]
+            dir = [randrange(-1, 1), randrange(-1, 1)]  
 
             particle = Particle(len(self.particles)+1, gridPos)
 

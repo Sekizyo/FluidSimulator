@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
 class Grid():
     def __init__(self, surface):
@@ -8,7 +9,7 @@ class Grid():
         self.widthBlocks = WIDTHBLOCKS
         self.heightBlocks = HEIGHTBLOCKS
         
-        self.renderDebug = False
+        self.renderDebug = True
         self.blocksCount = 0
         self.blocks = []
         self.createBlocks()
@@ -19,28 +20,54 @@ class Grid():
         elif self.renderDebug == False:
             self.renderDebug = True
 
+    def getPressureArrowVector(self, block):
+        startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
+        blockTemp = self.blockSize//2
+
+        if block.direction == 1:
+            endPos = [startPos[0] , startPos[1]-blockTemp]
+        elif block.direction == 2:
+            endPos = [startPos[0]+blockTemp , startPos[1]-blockTemp]
+        elif block.direction == 3:
+            endPos = [startPos[0]+blockTemp , startPos[1]]
+        elif block.direction == 4:
+            endPos = [startPos[0]+blockTemp , startPos[1]+blockTemp]
+        elif block.direction == 5:
+            endPos = [startPos[0] , startPos[1]+blockTemp]
+        elif block.direction == 6:
+            endPos = [startPos[0]-blockTemp , startPos[1]+blockTemp]
+        elif block.direction == 7:
+            endPos = [startPos[0]-blockTemp , startPos[1]]
+        elif block.direction == 8:
+            endPos = [startPos[0]-blockTemp, startPos[1]-blockTemp]
+
+        return startPos, endPos
+
     def render(self):
         for col in self.blocks:
             for block in col:
                 if block.particleID:
                     pygame.draw.rect(self.surface, (100,100,100), block.rect, 0)
+                
                 elif self.renderDebug:
                     pygame.draw.rect(self.surface, block.color, block.rect, 1)
                 
+                    startPos, endPos = self.getPressureArrowVector(block)
+                    pygame.draw.line(self.surface, block.color, startPos, endPos, 1)
+
                     idText = FONT.render(str(block.gridPos), 1, block.color)
                     pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2-10)))
                     
                     particleIDText = FONT.render(str(block.particleID), 1, (255,255,255))
                     pygame.Surface.blit(self.surface, particleIDText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2+10)))
                 
-
     def createBlocks(self):
         tempY = []
         for y in range(self.heightBlocks):
             tempX = []
             for x in range(self.widthBlocks):
                 id = len(self.blocks)+1
-                block = Block(id, x, y, self.blockSize)
+                block = Block(id, x, y, self.blockSize, randint(1,8))
                 self.blocksCount += 1
                 tempX.append(block)
             tempY.append(tempX)
@@ -102,10 +129,10 @@ class Grid():
     
     def moveParticle(self, particle, moves):
         particle.dir[1] += 1
-        # testX = particle.gridPos[0] + particle.dir[0]
-        # testY = particle.gridPos[1] + particle.dir[1]
-        # testMove = (testX, testY)
-        # testMoveRev = (-testX, -testY)
+        testX = particle.gridPos[0] + particle.dir[0]
+        testY = particle.gridPos[1] + particle.dir[1]
+        testMove = (testX, testY)
+        testMoveRev = (-testX, -testY)
         if testMove in moves:
             particle.move()
         elif testMoveRev in moves:
@@ -125,10 +152,11 @@ class Grid():
             self.moveParticle(particle, moves)
 
 class Block():
-    def __init__(self, id=0, x=0, y=0, size=1):
+    def __init__(self, id=0, x=0, y=0, size=1, direction = 8):
         self.id = id
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
         self.color = (255,255,255)
         self.size = size
         self.particleID = None
+        self.direction = direction
