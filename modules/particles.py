@@ -18,6 +18,11 @@ class Particles():
 
             self.particles.append(particle)
 
+    def reset(self):
+        self.particleCount = 0
+        self.particles = []
+        self.create(1)
+
 class Particle(pygame.sprite.Sprite):
     def __init__(self, id, gridPos, dir=[0,1], vel=1):
         super().__init__()
