@@ -108,9 +108,9 @@ class Grid():
         possibleMoves = self.getFreeMovesFromMoves(moves)
         return possibleMoves
         
-    def getNeighbourBlocks(self, block):
+    def getNeighbourBlocks(self, block, depth = 1):
         x, y = block.gridPos
-        neighbours = [(x-1,y), (x+1, y), (x, y-1), (x, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1)]
+        neighbours = self.createMoves(x, y, depth)
         neighboursCopy = neighbours.copy()
 
         for neighbour in neighbours:
@@ -121,6 +121,14 @@ class Grid():
                 neighboursCopy.remove(neighbour)
 
         return neighboursCopy
+
+    def createMoves(self, x, y, depth=1):
+        moves = []
+        for i in range(1, depth+1):
+            neighbours = [(x-i, y), (x+i, y), (x, y-i), (x, y+i), (x-i, y-i), (x+i, y-i), (x-i, y+i), (x+i, y+i)]
+            for neighbour in neighbours:
+                moves.append(neighbour)
+        return moves
 
     def getFreeMovesFromMoves(self, moves):
         movesCopy = moves.copy()
@@ -151,20 +159,23 @@ class Grid():
 
         particle.dir[1] = 0
 
-    def changeBlockDirectionsInRadius(self, mouse, radius = 3):
+    def changeBlockDirectionsInRadius(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        print(block.direction)
-        self.changeBlockDirection(block)
-        print(block.direction)
+        self.changeBlocksDirections(block)
 
     def getGridPosFromPos(self, pos):
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlockDirection(self, block, strenght=0.1):
-        block.changeDirectionByAmount(strenght)
+    def changeBlocksDirections(self, block, radius = 3):
+        blocks = self.getNeighbourBlocks(block, radius)
+        for gridPos in blocks:
+            self.changeBlockDirection(gridPos)
 
+    def changeBlockDirection(self, gridPos, strenght=0.5):
+        block = self.getBlockByGridPos(gridPos)
+        block.changeDirectionByAmount(strenght)
 
 class Block():
     def __init__(self, id=0, x=0, y=0, size=1, direction = 8):
