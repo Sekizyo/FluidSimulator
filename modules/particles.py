@@ -6,8 +6,9 @@ class Particles():
     def __init__(self):
         self.particleCount = 0
         self.particles = []
+        self.create()
 
-    def create(self, amount):
+    def create(self, amount=1):
         self.particleCount += 1
 
         for i in range(amount):

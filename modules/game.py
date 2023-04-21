@@ -20,7 +20,6 @@ class Game():
         self.exit = False
     
     def run(self):
-        self.particles.create(1)
         while not self.exit:
             self.clock.tick(self.fps)
             self.logic()
@@ -28,7 +27,8 @@ class Game():
 
     def logic(self):
         self.stresTest()
-        self.controls()
+        self.controlsKeyboard()
+        self.controlsMouse()
         self.grid.moveParticles(self.particles.particles)
 
     def stresTest(self):
@@ -38,20 +38,25 @@ class Game():
             # print("particles: ", sys.getsizeof(self.particles.particles))
             # print("blocks: ", sys.getsizeof(self.grid.blocks))
 
-    def controls(self):
+    def controlsKeyboard(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.exit = True
-            if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
-                self.exit = True
-            if pygame.key.get_pressed()[pygame.K_1] == True:
-                self.particles.create(1)
-            if pygame.key.get_pressed()[pygame.K_2] == True:
-                self.grid.switchRenderDebug()
-            if pygame.key.get_pressed()[pygame.K_SPACE] == True:
-                self.switchStopRender()
-            if pygame.key.get_pressed()[pygame.K_r] == True:
-                self.particles.reset()
+
+        if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
+            self.exit = True
+        if pygame.key.get_pressed()[pygame.K_1] == True:
+            self.particles.create(1)
+        if pygame.key.get_pressed()[pygame.K_2] == True:
+            self.grid.switchRenderDebug()
+        if pygame.key.get_pressed()[pygame.K_SPACE] == True:
+            self.switchStopRender()
+        if pygame.key.get_pressed()[pygame.K_r] == True:
+            self.particles.reset()
+
+    def controlsMouse(self):
+        if pygame.mouse.get_pressed()[0]:
+            self.grid.changeBlockDirectionsInRadius(pygame.mouse.get_pos())
 
     def render(self):
         if self.stopRender:

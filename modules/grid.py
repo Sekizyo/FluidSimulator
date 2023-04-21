@@ -36,21 +36,21 @@ class Grid():
         startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
         blockTemp = self.blockSize//2
 
-        if block.direction == 1:
+        if 0 <= block.direction <= 1:
             endPos = [startPos[0] , startPos[1]-blockTemp]
-        elif block.direction == 2:
+        elif 1 < block.direction <= 2:
             endPos = [startPos[0]+blockTemp , startPos[1]-blockTemp]
-        elif block.direction == 3:
+        elif 2 < block.direction <= 3:
             endPos = [startPos[0]+blockTemp , startPos[1]]
-        elif block.direction == 4:
+        elif 3 < block.direction <= 4:
             endPos = [startPos[0]+blockTemp , startPos[1]+blockTemp]
-        elif block.direction == 5:
+        elif 4 < block.direction <= 5:
             endPos = [startPos[0] , startPos[1]+blockTemp]
-        elif block.direction == 6:
+        elif 5 < block.direction <= 6:
             endPos = [startPos[0]-blockTemp , startPos[1]+blockTemp]
-        elif block.direction == 7:
+        elif 6 < block.direction <= 7:
             endPos = [startPos[0]-blockTemp , startPos[1]]
-        elif block.direction == 8:
+        elif 7 < block.direction <= 8:
             endPos = [startPos[0]-blockTemp, startPos[1]-blockTemp]
 
         return startPos, endPos
@@ -151,6 +151,21 @@ class Grid():
 
         particle.dir[1] = 0
 
+    def changeBlockDirectionsInRadius(self, mouse, radius = 3):
+        gridPos = self.getGridPosFromPos(mouse)
+        block = self.getBlockByGridPos(gridPos)
+        print(block.direction)
+        self.changeBlockDirection(block)
+        print(block.direction)
+
+    def getGridPosFromPos(self, pos):
+        x, y = pos
+        return x//self.blockSize, y//self.blockSize
+
+    def changeBlockDirection(self, block, strenght=0.1):
+        block.changeDirectionByAmount(strenght)
+
+
 class Block():
     def __init__(self, id=0, x=0, y=0, size=1, direction = 8):
         self.id = id
@@ -160,3 +175,8 @@ class Block():
         self.size = size
         self.particleID = None
         self.direction = direction
+
+    def changeDirectionByAmount(self, amount):
+        self.direction += amount
+        if self.direction > 8:
+            self.direction -= 8
