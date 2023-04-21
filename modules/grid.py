@@ -71,9 +71,7 @@ class Grid():
             neighbourX, neighbourY = neighbour
             newBlock = self.getBlockByGridPos(neighbour)
 
-            if newBlock:
-                newBlock = self.blocks[neighbourY][neighbourX]
-            else:
+            if not newBlock:
                 neighboursCopy.remove(neighbour)
 
         return neighboursCopy
@@ -104,10 +102,10 @@ class Grid():
     
     def moveParticle(self, particle, moves):
         particle.dir[1] += 1
-        testX = particle.gridPos[0] + particle.dir[0]
-        testY = particle.gridPos[1] + particle.dir[1]
-        testMove = (testX, testY)
-        testMoveRev = (-testX, -testY)
+        # testX = particle.gridPos[0] + particle.dir[0]
+        # testY = particle.gridPos[1] + particle.dir[1]
+        # testMove = (testX, testY)
+        # testMoveRev = (-testX, -testY)
         if testMove in moves:
             particle.move()
         elif testMoveRev in moves:
