@@ -1,4 +1,5 @@
 
+import sys
 import pygame
 from modules import STRESTEST, FONT
 from modules.screen import Screen
@@ -31,6 +32,8 @@ class Game():
         if STRESTEST:
             self.fps = 60
             self.particles.create(1)
+            # print("particles: ", sys.getsizeof(self.particles.particles))
+            # print("blocks: ", sys.getsizeof(self.grid.blocks))
 
     def controls(self):
         for event in pygame.event.get():

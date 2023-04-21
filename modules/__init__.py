@@ -9,7 +9,7 @@ import pygame
 pygame.init()
 FONT = pygame.font.SysFont("Arial", 18)
 
-STRESTEST = False
+STRESTEST = True
 if STRESTEST:
     BLOCKSIZE = 1
     WIDTHBLOCKS = WIDTH//BLOCKSIZE

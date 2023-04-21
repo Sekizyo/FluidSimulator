@@ -22,7 +22,17 @@ class Grid():
     def render(self):
         for col in self.blocks:
             for block in col:
-                block.render(self.surface, self.renderDebug)
+                if block.particleID:
+                    pygame.draw.rect(self.surface, (100,100,100), block.rect, 0)
+                elif self.renderDebug:
+                    pygame.draw.rect(self.surface, block.color, block.rect, 1)
+                
+                    idText = FONT.render(str(block.gridPos), 1, block.color)
+                    pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2-10)))
+                    
+                    particleIDText = FONT.render(str(block.particleID), 1, (255,255,255))
+                    pygame.Surface.blit(self.surface, particleIDText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2+10)))
+                
 
     def createBlocks(self):
         tempY = []
@@ -124,17 +134,3 @@ class Block():
         self.color = (255,255,255)
         self.size = size
         self.particleID = None
-
-    def render(self, surface, debug=False):
-        if self.particleID:
-            pygame.draw.rect(surface, (100,100,100), self.rect, 0)
-        elif debug:
-            pygame.draw.rect(surface, self.color, self.rect, 1)
-        
-            idText = FONT.render(str(self.gridPos), 1, self.color)
-            pygame.Surface.blit(surface, idText, (self.rect[0]+(self.size//2), self.rect[1]+(self.size//2-10)))
-            
-            particleIDText = FONT.render(str(self.particleID), 1, (255,255,255))
-            pygame.Surface.blit(surface, particleIDText, (self.rect[0]+(self.size//2), self.rect[1]+(self.size//2+10)))
-        
-    
