@@ -14,6 +14,18 @@ class Grid():
         self.blocks = []
         self.createBlocks()
 
+    def createBlocks(self):
+        tempY = []
+        for y in range(self.heightBlocks):
+            tempX = []
+            for x in range(self.widthBlocks):
+                id = len(self.blocks)+1
+                block = Block(id, x, y, self.blockSize, randint(1,8))
+                self.blocksCount += 1
+                tempX.append(block)
+            tempY.append(tempX)
+        self.blocks = tempY
+
     def switchRenderDebug(self):
         if self.renderDebug == True:
             self.renderDebug = False
@@ -60,18 +72,17 @@ class Grid():
                     
                     particleIDText = FONT.render(str(block.particleID), 1, (255,255,255))
                     pygame.Surface.blit(self.surface, particleIDText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2+10)))
-                
-    def createBlocks(self):
-        tempY = []
-        for y in range(self.heightBlocks):
-            tempX = []
-            for x in range(self.widthBlocks):
-                id = len(self.blocks)+1
-                block = Block(id, x, y, self.blockSize, randint(1,8))
-                self.blocksCount += 1
-                tempX.append(block)
-            tempY.append(tempX)
-        self.blocks = tempY
+
+    def moveParticles(self, particles):
+        self.refreshParticleAssigment(particles)
+        for particle in particles:
+            moves = self.getPossibleMovesByPosition(particle.gridPos)
+            self.moveParticle(particle, moves)
+
+    def refreshParticleAssigment(self, particles):
+        self.tempClearHighlight()
+        self.tempClearBlockID()
+        self.assignParticlesToBlocks(particles)
 
     def tempClearHighlight(self):
         for col in self.blocks:
@@ -83,12 +94,20 @@ class Grid():
             for block in col:
                 block.particleID = None
 
-    def getBlockByGridPos(self, pos):
-        x, y = pos
-        if x < 0 or y < 0 or x >= self.widthBlocks or y >= self.heightBlocks: 
-            return None
-        return self.blocks[y][x]
-            
+    def assignParticlesToBlocks(self, particles):
+        for particle in particles:
+            self.assignParticleToBlock(particle)
+
+    def assignParticleToBlock(self, particle):
+        block = self.getBlockByGridPos(particle.gridPos)
+        block.particleID = particle.id
+
+    def getPossibleMovesByPosition(self, position):
+        block = self.getBlockByGridPos(position)
+        moves = self.getNeighbourBlocks(block)
+        possibleMoves = self.getFreeMovesFromMoves(moves)
+        return possibleMoves
+        
     def getNeighbourBlocks(self, block):
         x, y = block.gridPos
         neighbours = [(x-1,y), (x+1, y), (x, y-1), (x, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1)]
@@ -113,19 +132,11 @@ class Grid():
 
         return movesCopy
 
-    def getPossibleMovesByPosition(self, position):
-        block = self.getBlockByGridPos(position)
-        moves = self.getNeighbourBlocks(block)
-        possibleMoves = self.getFreeMovesFromMoves(moves)
-        return possibleMoves
-
-    def assignParticleToBlock(self, particle):
-        block = self.getBlockByGridPos(particle.gridPos)
-        block.particleID = particle.id
-            
-    def assignParticlesToBlocks(self, particles):
-        for particle in particles:
-            self.assignParticleToBlock(particle)
+    def getBlockByGridPos(self, pos):
+        x, y = pos
+        if x < 0 or y < 0 or x >= self.widthBlocks or y >= self.heightBlocks: 
+            return None
+        return self.blocks[y][x]
     
     def moveParticle(self, particle, moves):
         particle.dir[1] += 1
@@ -139,17 +150,6 @@ class Grid():
             particle.move()
 
         particle.dir[1] = 0
-
-    def refreshParticleAssigment(self, particles):
-        self.tempClearHighlight()
-        self.tempClearBlockID()
-        self.assignParticlesToBlocks(particles)
-
-    def moveParticles(self, particles):
-        self.refreshParticleAssigment(particles)
-        for particle in particles:
-            moves = self.getPossibleMovesByPosition(particle.gridPos)
-            self.moveParticle(particle, moves)
 
 class Block():
     def __init__(self, id=0, x=0, y=0, size=1, direction = 8):
