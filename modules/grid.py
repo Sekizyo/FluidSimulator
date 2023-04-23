@@ -125,7 +125,7 @@ class Grid():
     def createMoves(self, x, y, depth=1):
         moves = []
         for i in range(1, depth+1):
-            neighbours = [(x-i, y), (x+i, y), (x, y-i), (x, y+i), (x-i, y-i), (x+i, y-i), (x-i, y+i), (x+i, y+i)]
+            neighbours = [[x-i, y], [x+i, y], [x, y-i], [x, y+i], [x-i, y-i], [x+i, y-i], [x-i, y+i], [x+i, y+i]]
             for neighbour in neighbours:
                 moves.append(neighbour)
         return moves
@@ -147,28 +147,44 @@ class Grid():
         return self.blocks[y][x]
     
     def moveParticle(self, particle, moves):
-        particle.dir[1] += 1
-        testX = particle.gridPos[0] + particle.dir[0]
-        testY = particle.gridPos[1] + particle.dir[1]
-        testMove = (testX, testY)
-        testMoveRev = (-testX, -testY)
-        if testMove in moves:
-            particle.move()
-        elif testMoveRev in moves:
-            particle.move()
+        block = self.getBlockByGridPos(particle.gridPos)
+        position = self.translateDirToVec(block.position)
+        position[0] += block.gridPos[0]
+        position[1] += block.gridPos[1]
+        if position in moves:
+            particle.gridPos = position
 
-        particle.dir[1] = 0
+    def translateDirToVec(self, dir):
+        vec = []
+        if 0 <= dir <= 1:
+            vec = [0, -1]
+        elif 1 < dir <= 2:
+            vec = [1, -1]
+        elif 2 < dir <= 3:
+            vec = [1, 0]
+        elif 3 < dir <= 4:
+            vec = [1, 1]
+        elif 4 < dir <= 5:
+            vec = [0, 1]
+        elif 5 < dir <= 6:
+            vec = [-1, 1]
+        elif 6 < dir <= 7:
+            vec = [-1, 0]
+        elif 7 < dir <= 8:
+            vec = [-1, -1]
 
-    def changeBlockDirectionsInRadius(self, mouse):
+        return vec
+
+    def changeBlockDirections(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        self.changeBlocksDirections(block)
+        self.changeBlocksDirectionsInRadius(block)
 
     def getGridPosFromPos(self, pos):
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlocksDirections(self, block, radius = 3):
+    def changeBlocksDirectionsInRadius(self, block, radius = 3):
         blocks = self.getNeighbourBlocks(block, radius)
         for gridPos in blocks:
             self.changeBlockDirection(gridPos)

@@ -56,7 +56,7 @@ class Game():
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:
-            self.grid.changeBlockDirectionsInRadius(pygame.mouse.get_pos())
+            self.grid.changeBlockDirections(pygame.mouse.get_pos())
 
     def render(self):
         if self.stopRender:
