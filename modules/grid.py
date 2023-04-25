@@ -145,7 +145,8 @@ class Grid():
     def changeBlockDirections(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        self.changeBlocksDirectionsInRadius(block, gridPos)
+        if block:
+            self.changeBlocksDirectionsInRadius(block, gridPos)
 
     def getGridPosFromPos(self, pos):
         x, y = pos
