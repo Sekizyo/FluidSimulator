@@ -20,7 +20,7 @@ class Grid():
             tempX = []
             for x in range(self.widthBlocks):
                 id = len(self.blocks)+1
-                block = Block(id, x, y, self.blockSize, randint(1,8))
+                block = Block(id, x, y, self.blockSize, [randint(-1, 1), randint(-1, 1)])
                 self.blocksCount += 1
                 tempX.append(block)
             tempY.append(tempX)
@@ -34,24 +34,11 @@ class Grid():
 
     def getPressureArrowVector(self, block):
         startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
-        blockTemp = self.blockSize//2
+        
+        direction = block.direction
+        strenght = block.pressureStrenght
 
-        if 0 <= block.direction <= 1:
-            endPos = [startPos[0] , startPos[1]-blockTemp]
-        elif 1 < block.direction <= 2:
-            endPos = [startPos[0]+blockTemp , startPos[1]-blockTemp]
-        elif 2 < block.direction <= 3:
-            endPos = [startPos[0]+blockTemp , startPos[1]]
-        elif 3 < block.direction <= 4:
-            endPos = [startPos[0]+blockTemp , startPos[1]+blockTemp]
-        elif 4 < block.direction <= 5:
-            endPos = [startPos[0] , startPos[1]+blockTemp]
-        elif 5 < block.direction <= 6:
-            endPos = [startPos[0]-blockTemp , startPos[1]+blockTemp]
-        elif 6 < block.direction <= 7:
-            endPos = [startPos[0]-blockTemp , startPos[1]]
-        elif 7 < block.direction <= 8:
-            endPos = [startPos[0]-blockTemp, startPos[1]-blockTemp]
+        endPos = [startPos[0]+(direction[0]*strenght) , startPos[1]+(direction[1]*strenght)]
 
         return startPos, endPos
 
@@ -148,53 +135,36 @@ class Grid():
     
     def moveParticle(self, particle, moves):
         block = self.getBlockByGridPos(particle.gridPos)
-        position = self.translateDirToVec(block.position)
-        position[0] += block.gridPos[0]
-        position[1] += block.gridPos[1]
+        position = particle.gridPos
+
+        position[0] += block.direction[0]
+        position[1] += block.direction[1]
         if position in moves:
             particle.gridPos = position
-
-    def translateDirToVec(self, dir):
-        vec = []
-        if 0 <= dir <= 1:
-            vec = [0, -1]
-        elif 1 < dir <= 2:
-            vec = [1, -1]
-        elif 2 < dir <= 3:
-            vec = [1, 0]
-        elif 3 < dir <= 4:
-            vec = [1, 1]
-        elif 4 < dir <= 5:
-            vec = [0, 1]
-        elif 5 < dir <= 6:
-            vec = [-1, 1]
-        elif 6 < dir <= 7:
-            vec = [-1, 0]
-        elif 7 < dir <= 8:
-            vec = [-1, -1]
-
-        return vec
 
     def changeBlockDirections(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        self.changeBlocksDirectionsInRadius(block)
+        self.changeBlocksDirectionsInRadius(block, gridPos)
 
     def getGridPosFromPos(self, pos):
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlocksDirectionsInRadius(self, block, radius = 3):
+    def changeBlocksDirectionsInRadius(self, block, center, radius = 3):
         blocks = self.getNeighbourBlocks(block, radius)
         for gridPos in blocks:
-            self.changeBlockDirection(gridPos)
+            self.changeBlockDirection(gridPos, center)
 
-    def changeBlockDirection(self, gridPos, strenght=0.5):
+    def changeBlockDirection(self, gridPos, center, strenght=2):
         block = self.getBlockByGridPos(gridPos)
-        block.changeDirectionByAmount(strenght)
+        center = self.getBlockByGridPos(center)
+
+        block.direction[0] = round((center.gridPos[0] - block.gridPos[1])//strenght)
+        block.direction[1] = round((center.gridPos[1] - block.gridPos[1])//strenght)
 
 class Block():
-    def __init__(self, id=0, x=0, y=0, size=1, direction = 8):
+    def __init__(self, id=0, x=0, y=0, size=1, direction = [0, 1]):
         self.id = id
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
@@ -202,8 +172,4 @@ class Block():
         self.size = size
         self.particleID = None
         self.direction = direction
-
-    def changeDirectionByAmount(self, amount):
-        self.direction += amount
-        if self.direction > 8:
-            self.direction -= 8
+        self.pressureStrenght = 40
