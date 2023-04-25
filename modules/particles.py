@@ -1,6 +1,6 @@
 import pygame
-from random import randrange
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
+from random import random, randrange
+from modules import STRESTEST, BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
 
 class Particles():
     def __init__(self):
@@ -12,8 +12,8 @@ class Particles():
         self.particleCount += 1
 
         for i in range(amount):
-            gridPos = [randrange(0,WIDTHBLOCKS), randrange(0,2)]
-            dir = [randrange(-1, 1), randrange(-1, 1)]  
+            gridPos = [randrange(0,WIDTHBLOCKS), randrange(0,HEIGHTBLOCKS)]
+            direction = [random(), random()]  
 
             particle = Particle(len(self.particles)+1, gridPos)
 
@@ -25,14 +25,14 @@ class Particles():
         self.create(1)
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, id, gridPos, dir=[0,1], vel=1):
+    def __init__(self, id, gridPos, direction=[0,1], vel=1):
         super().__init__()
         self.id = id
 
         self.gridPos = gridPos
-        self.dir = dir
+        self.direction = direction
         self.vel = 1
 
     def move(self):
-        self.gridPos[0] += int(self.dir[0] * self.vel)
-        self.gridPos[1] += int(self.dir[1] * self.vel)
+        self.gridPos[0] += int(self.direction[0] * self.vel)
+        self.gridPos[1] += int(self.direction[1] * self.vel)
