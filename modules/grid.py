@@ -67,16 +67,10 @@ class Grid():
             self.moveParticle(particle, moves)
 
     def refreshParticleAssigment(self, particles):
-        self.tempClearHighlight()
-        self.tempClearBlockID()
+        self.clearBlockID()
         self.assignParticlesToBlocks(particles)
 
-    def tempClearHighlight(self):
-        for col in self.blocks:
-            for block in col:
-                block.highlight = False
-
-    def tempClearBlockID(self):
+    def clearBlockID(self):
         for col in self.blocks:
             for block in col:
                 block.particleID = None
@@ -91,69 +85,54 @@ class Grid():
 
     def getPossibleMovesByPosition(self, position):
         block = self.getBlockByGridPos(position)
-        moves = self.getNeighbourBlocks(block)
-        possibleMoves = self.getFreeMovesFromMoves(moves)
-        return possibleMoves
-        
-    def getNeighbourBlocks(self, block, depth = 1):
-        x, y = block.gridPos
-        neighbours = self.createMoves(x, y, depth)
-        neighboursCopy = neighbours.copy()
-
-        for neighbour in neighbours:
-            neighbourX, neighbourY = neighbour
-            newBlock = self.getBlockByGridPos(neighbour)
-
-            if not newBlock:
-                neighboursCopy.remove(neighbour)
-
-        return neighboursCopy
-
-    def createMoves(self, x, y, depth=1):
+        moves = self.createMoves(block)
+        return moves
+    
+    def createMoves(self, block, depth=1):
         moves = []
+        x, y = block.gridPos
         for i in range(1, depth+1):
             neighbours = [[x-i, y], [x+i, y], [x, y-i], [x, y+i], [x-i, y-i], [x+i, y-i], [x-i, y+i], [x+i, y+i]]
             for neighbour in neighbours:
-                moves.append(neighbour)
+                if self.checkBounds(neighbour) and self.blocks[y][x].particleID == None:
+                    moves.append(neighbour)
         return moves
 
-    def getFreeMovesFromMoves(self, moves):
-        movesCopy = moves.copy()
-        for move in moves:
-            x, y = move
-            block = self.blocks[y][x]
-            if block.particleID:
-                movesCopy.remove(move)
-
-        return movesCopy
-
     def getBlockByGridPos(self, pos):
-        x, y = pos
-        if x < 0 or y < 0 or x >= self.widthBlocks or y >= self.heightBlocks: 
+        if self.checkBounds(pos):
+            x, y = pos
+            return self.blocks[y][x]
+        else:
             return None
-        return self.blocks[y][x]
-    
+
+    def checkBounds(self, pos):
+        x, y = pos
+        if (0 <= x <= self.widthBlocks-1) and (0 <= y <= self.heightBlocks-1):
+            return True
+        return False
+
     def moveParticle(self, particle, moves):
         block = self.getBlockByGridPos(particle.gridPos)
         position = particle.gridPos
 
         position[0] += block.direction[0]
         position[1] += block.direction[1]
-        if position in moves:
-            particle.gridPos = position
-
+        if self.checkBounds(position):
+            if position in moves:
+                print(f"position: {position}")
+                particle.gridPos = position
+                
     def changeBlockDirections(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        if block:
-            self.changeBlocksDirectionsInRadius(block, gridPos)
+        self.changeBlocksDirectionsInRadius(block, gridPos)
 
     def getGridPosFromPos(self, pos):
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
     def changeBlocksDirectionsInRadius(self, block, center, radius = 3):
-        blocks = self.getNeighbourBlocks(block, radius)
+        blocks = self.createMoves(block, radius)
         for gridPos in blocks:
             self.changeBlockDirection(gridPos, center)
 

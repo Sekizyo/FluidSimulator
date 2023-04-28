@@ -32,7 +32,3 @@ class Particle(pygame.sprite.Sprite):
         self.gridPos = gridPos
         self.direction = direction
         self.vel = 1
-
-    def move(self):
-        self.gridPos[0] += int(self.direction[0] * self.vel)
-        self.gridPos[1] += int(self.direction[1] * self.vel)
