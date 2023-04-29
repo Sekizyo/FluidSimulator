@@ -20,7 +20,6 @@ class Grid():
             tempX = []
             for x in range(self.widthBlocks):
                 block = Block(x, y, self.blockSize, [randint(-1, 1), randint(-1, 1)])
-                # block = Block(x, y, self.blockSize)
                 tempX.append(block)
             tempY.append(tempX)
         self.blocks = tempY
@@ -125,7 +124,9 @@ class Grid():
             self.changeBlockDirection(gridPos, center)
 
     def changeBlockDirection(self, gridPos, center):
-        blockX, blockY = self.getBlockByGridPos(gridPos).gridPos
+        block = self.getBlockByGridPos(gridPos)
+        
+        blockX, blockY = block.gridPos
         centerX, centerY = center.gridPos
         
         dirX = centerX - blockX
