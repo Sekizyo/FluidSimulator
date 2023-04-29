@@ -26,9 +26,13 @@ class Game():
             self.render()
 
     def logic(self):
-        self.stresTest()
         self.controlsKeyboard()
         self.controlsMouse()
+
+        if self.stopRender:
+            return
+            
+        self.stresTest()
         self.grid.moveParticles(self.particles.particles)
 
     def stresTest(self):
