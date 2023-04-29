@@ -124,12 +124,27 @@ class Grid():
         for gridPos in blocks:
             self.changeBlockDirection(gridPos, center)
 
-    def changeBlockDirection(self, gridPos, center, strenght = 4):
-        block = self.getBlockByGridPos(gridPos)
+    def changeBlockDirection(self, gridPos, center):
+        blockX, blockY = self.getBlockByGridPos(gridPos).gridPos
+        centerX, centerY = center.gridPos
+        
+        dirX = centerX - blockX
+        dirY = centerY - blockY
+        
+        block.direction[0] = self.normalize(dirX)
+        block.direction[1] = self.normalize(dirY)
 
-        block.direction[0] = round((center.gridPos[0] - block.gridPos[0])//strenght)
-        block.direction[1] = round((center.gridPos[1] - block.gridPos[1])//strenght)
-        print(block.direction)
+    def normalize(self, value):
+        if value >= 1:
+            value = 1
+        elif 0 <= value < 1:
+            value = 0
+        elif -1 <= value < 0:
+            value = -1
+        elif -1 > value:
+            value = -1
+
+        return value
 
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
