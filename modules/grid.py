@@ -140,17 +140,23 @@ class Grid():
 
         return value
 
-    def changeBlockDirection(self, gridPos, center):
+    def changeBlockDirection(self, gridPos, center, possitive=True):
         block = self.getBlockByGridPos(gridPos)
         
         blockX, blockY = block.gridPos
         centerX, centerY = center.gridPos
-        
-        dirX = blockX - centerX
-        dirY = blockY - centerY
-
+        if possitive:
+            dirX = blockX - centerX
+            dirY = blockY - centerY
+        else:
+            dirX = centerX - blockX
+            dirY = centerY - blockY
+            
         block.direction[0] = self.normalize(dirX)
         block.direction[1] = self.normalize(dirY)
+
+    def getGlobalPressure(self):
+        pass #TODO
 
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 0]):
