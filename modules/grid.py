@@ -19,7 +19,7 @@ class Grid():
         for y in range(self.heightBlocks):
             tempX = []
             for x in range(self.widthBlocks):
-                block = Block(x, y, self.blockSize, [randint(-1, 1), randint(-1, 1)])
+                block = Block(x, y, self.blockSize)
                 tempX.append(block)
             tempY.append(tempX)
         self.blocks = tempY
@@ -34,7 +34,7 @@ class Grid():
         startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
         
         direction = block.direction
-        strenght = block.pressureStrenght
+        strenght = 12
 
         endPos = [startPos[0]+(direction[0]*strenght) , startPos[1]+(direction[1]*strenght)]
 
@@ -69,7 +69,7 @@ class Grid():
             for block in col:
                 block.particleID = None
 
-    def createMoves(self, block, depth=1):
+    def createMoves(self, block, depth=1, excludeOccupied=True):
         moves = []
         x, y = block.gridPos
         for i in range(1, depth+1):
@@ -78,6 +78,9 @@ class Grid():
                 neiX, neiY = neighbour
                 if self.checkBounds(neighbour) and self.blocks[neiY][neiX].particleID == None:
                     moves.append(neighbour)
+                elif excludeOccupied == False and self.checkBounds(neighbour):
+                    moves.append(neighbour)
+
         return moves
 
     def getBlockByGridPos(self, pos):
@@ -97,12 +100,13 @@ class Grid():
         positionStart = particle.gridPos
         block = self.getBlockByGridPos(positionStart)
         position = [positionStart[0] + block.direction[0], positionStart[1] + block.direction[1]]
-
         if self.checkBounds(position):
             if position in moves:
                 self.assignParticleToBlockByPos(particle, position)
+                self.changeBlocksDirectionsInRadius(block)
         else:
             self.assignParticleToBlockByPos(particle, positionStart)
+            self.changeBlocksDirectionsInRadius(block)
             
     def assignParticleToBlockByPos(self, particle, position):
             particle.gridPos = position
@@ -118,22 +122,10 @@ class Grid():
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlocksDirectionsInRadius(self, center, radius = 3):
-        blocks = self.createMoves(center, radius)
+    def changeBlocksDirectionsInRadius(self, center, radius = 2):
+        blocks = self.createMoves(center, radius, False)
         for gridPos in blocks:
             self.changeBlockDirection(gridPos, center)
-
-    def changeBlockDirection(self, gridPos, center):
-        block = self.getBlockByGridPos(gridPos)
-        
-        blockX, blockY = block.gridPos
-        centerX, centerY = center.gridPos
-        
-        dirX = centerX - blockX
-        dirY = centerY - blockY
-        
-        block.direction[0] = self.normalize(dirX)
-        block.direction[1] = self.normalize(dirY)
 
     def normalize(self, value):
         if value >= 1:
@@ -147,12 +139,24 @@ class Grid():
 
         return value
 
+    def changeBlockDirection(self, gridPos, center):
+        block = self.getBlockByGridPos(gridPos)
+        
+        blockX, blockY = block.gridPos
+        centerX, centerY = center.gridPos
+        
+        dirX = blockX - centerX
+        dirY = blockY - centerY
+
+        block.direction[0] = self.normalize(dirX)
+        block.direction[1] = self.normalize(dirY)
+
 class Block():
-    def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
+    def __init__(self, x=0, y=0, size=1, direction = [0, 0]):
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
         self.color = (255,255,255)
         self.size = size
         self.particleID = None
         self.direction = direction
-        self.pressureStrenght = 40
+        self.pressureStrenght = 1

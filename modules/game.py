@@ -39,6 +39,7 @@ class Game():
         if STRESTEST:
             self.fps = 60
             self.particles.create(1)
+            self.grid.renderDebug = False
             # print("particles: ", sys.getsizeof(self.particles.particles))
             # print("blocks: ", sys.getsizeof(self.grid.blocks))
 
