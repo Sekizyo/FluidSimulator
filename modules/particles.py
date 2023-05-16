@@ -9,15 +9,22 @@ class Particles():
         self.create()
 
     def create(self, amount=1):
-        self.particleCount += 1
+        self.particleCount += amount
 
         for i in range(amount):
             gridPos = [randrange(0,WIDTHBLOCKS), randrange(0,HEIGHTBLOCKS)]
-            direction = [random(), random()]  
 
             particle = Particle(len(self.particles)+1, gridPos)
 
             self.particles.append(particle)
+    
+    def createAtPos(self, pos):
+        x, y = pos
+        gridPos = [x//BLOCKSIZE, y//BLOCKSIZE]
+        particle = Particle(len(self.particles)+1, gridPos)
+
+        self.particleCount += 1
+        self.particles.append(particle)
 
     def reset(self):
         self.particleCount = 0

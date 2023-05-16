@@ -61,6 +61,8 @@ class Game():
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:
+            self.particles.createAtPos(pygame.mouse.get_pos())
+        elif pygame.mouse.get_pressed()[1]:
             self.grid.changeBlockDirections(pygame.mouse.get_pos())
 
     def render(self):

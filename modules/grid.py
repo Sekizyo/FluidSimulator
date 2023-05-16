@@ -59,15 +59,16 @@ class Grid():
                     pygame.Surface.blit(self.surface, particleIDText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2+10)))
 
     def moveParticles(self, particles):
-        self.refreshParticleAssigment()
+        self.refreshBlock()
         for particle in particles:
             moves = self.createMoves(particle)
             self.moveParticle(particle, moves)
 
-    def refreshParticleAssigment(self):
+    def refreshBlock(self):
         for col in self.blocks:
             for block in col:
                 block.particleID = None
+                block.direction = [0,0]
 
     def createMoves(self, block, depth=1, excludeOccupied=True):
         moves = []
@@ -122,7 +123,7 @@ class Grid():
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlocksDirectionsInRadius(self, center, radius = 2):
+    def changeBlocksDirectionsInRadius(self, center, radius = 5):
         blocks = self.createMoves(center, radius, False)
         for gridPos in blocks:
             self.changeBlockDirection(gridPos, center)
