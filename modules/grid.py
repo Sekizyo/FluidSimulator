@@ -1,4 +1,7 @@
 import pygame
+
+import numpy as np
+
 from random import randint
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
 
@@ -11,7 +14,7 @@ class Grid():
         self.heightBlocks = HEIGHTBLOCKS
         
         self.renderDebug = True
-        self.blocks = []
+        self.blocks = np.arange(self.widthBlocks*self.heightBlocks).reshape(self.heightBlocks, self.widthBlocks)
         self.createBlocks()
 
     def createBlocks(self):
@@ -110,9 +113,9 @@ class Grid():
             self.changeBlocksDirectionsInRadius(block)
             
     def assignParticleToBlockByPos(self, particle, position):
-            particle.gridPos = position
-            block = self.getBlockByGridPos(position)
-            block.particleID = particle.id
+        particle.gridPos = position
+        block = self.getBlockByGridPos(position)
+        block.particleID = particle.id
 
     def changeBlockDirections(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
@@ -123,7 +126,7 @@ class Grid():
         x, y = pos
         return x//self.blockSize, y//self.blockSize
 
-    def changeBlocksDirectionsInRadius(self, center, radius = 5):
+    def changeBlocksDirectionsInRadius(self, center, radius = 3):
         blocks = self.createMoves(center, radius, False)
         for gridPos in blocks:
             self.changeBlockDirection(gridPos, center)
