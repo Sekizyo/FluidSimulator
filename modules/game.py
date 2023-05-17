@@ -58,6 +58,7 @@ class Game():
             self.switchStopRender()
         if pygame.key.get_pressed()[pygame.K_r] == True:
             self.particles.reset()
+            self.grid.refreshBlockDir()
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:

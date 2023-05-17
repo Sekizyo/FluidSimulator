@@ -49,29 +49,31 @@ class Grid():
                 if block.particleID:
                     pygame.draw.rect(self.surface, (100,100,100), block.rect, 0)
                 
-                elif self.renderDebug:
+                if self.renderDebug:
                     pygame.draw.rect(self.surface, block.color, block.rect, 1)
                 
                     startPos, endPos = self.getPressureArrowVector(block)
                     pygame.draw.line(self.surface, block.color, startPos, endPos, 1)
 
                     idText = FONT.render(str(block.gridPos), 1, block.color)
-                    pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2-10)))
+                    pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
                     
-                    particleIDText = FONT.render(str(block.particleID), 1, (255,255,255))
-                    pygame.Surface.blit(self.surface, particleIDText, (block.rect[0]+(block.size//2), block.rect[1]+(block.size//2+10)))
-
-    def moveParticles(self, particles):
-        self.refreshBlock()
-        for particle in particles:
-            moves = self.createMoves(particle)
-            self.moveParticle(particle, moves)
-
-    def refreshBlock(self):
+    def refreshBlockAssigment(self):
         for col in self.blocks:
             for block in col:
                 block.particleID = None
-                block.direction = [0,0]
+                # block.direction = [0,0]
+
+    def refreshBlockDir(self):
+        for col in self.blocks:
+            for block in col:
+                block.direction = [0,1]
+
+    def moveParticles(self, particles):
+        self.refreshBlockAssigment()
+        for particle in particles:
+            moves = self.createMoves(particle, 1, True)
+            self.moveParticle(particle, moves)
 
     def getMoves(self, pos, depth=1):
         moves = []
@@ -89,11 +91,12 @@ class Grid():
         neighbours = self.getMoves(block.gridPos, depth)
 
         for neighbour in neighbours:
-            neiX, neiY = neighbour
-            if self.checkBounds(neighbour) and self.blocks[neiY][neiX].particleID == None:
-                moves.append(neighbour)
-            elif excludeOccupied == False and self.checkBounds(neighbour):
-                moves.append(neighbour)
+            if self.checkBounds(neighbour):
+                neiX, neiY = neighbour
+                if excludeOccupied and self.blocks[neiY][neiX].particleID == None:
+                    moves.append(neighbour)
+                else:
+                    moves.append(neighbour)
 
         return moves
 
@@ -165,14 +168,14 @@ class Grid():
             dirX = centerX - blockX
             dirY = centerY - blockY
             
-        block.direction[0] = self.normalize(dirX)
-        block.direction[1] = self.normalize(dirY)
+        block.direction[0] = self.normalize(block.direction[0] + dirX)
+        block.direction[1] = self.normalize(block.direction[1] + dirY)
 
     def getGlobalPressure(self):
         pass #TODO
 
 class Block():
-    def __init__(self, x=0, y=0, size=1, direction = [0, 0]):
+    def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
         self.color = (255,255,255)
