@@ -1,0 +1,14 @@
+Opty:
+	scale block size depending on particle count in area
+
+Block:
+	velocity
+	denisty
+	temperature
+
+Dyfiusion:
+	block value gets avg value of neighbours
+
+Physics:
+	Navier-Stokes Equations
+https://www.youtube.com/redirectevent=video_description&redir_token=QUFFLUhqbWhJN0t5bUlPNlFrdlB1bW5CUTlnXzB1bkNHd3xBQ3Jtc0ttNmRZbkJEMXMxRTVicktvWGhhb3JoWHdUdW93ZlhTQTVUYmJXS3NNaXkwd3JkTEI3R0xUZGdZVlBzWmx6MEM4UkU4eURObWdQVFpOYUt2WWpaOGFPaW5yTEcyM09ZWVB6c2RIVm1FNHY2TzJLcTV6bw&q=https%3A%2F%2Fwww.autodesk.com%2Fresearch%2Fpublications%2Freal-time-fluid-dynamics&v=qsYE1wMEMPA
