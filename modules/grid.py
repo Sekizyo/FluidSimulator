@@ -73,17 +73,27 @@ class Grid():
                 block.particleID = None
                 block.direction = [0,0]
 
+    def getMoves(self, pos, depth=1):
+        moves = []
+        startPosX, startPosY = pos
+
+        X = int(depth)
+        for x in range(-X,X+1):
+            Y = int((depth*depth-x*x)**0.5)
+            for y in range(-Y,Y+1):
+                moves.append([x+startPosX, y+startPosY])
+        return moves
+
     def createMoves(self, block, depth=1, excludeOccupied=True):
         moves = []
-        x, y = block.gridPos
-        for i in range(1, depth+1):
-            neighbours = [[x-i, y], [x+i, y], [x, y-i], [x, y+i], [x-i, y-i], [x+i, y-i], [x-i, y+i], [x+i, y+i], [x, y]]
-            for neighbour in neighbours:
-                neiX, neiY = neighbour
-                if self.checkBounds(neighbour) and self.blocks[neiY][neiX].particleID == None:
-                    moves.append(neighbour)
-                elif excludeOccupied == False and self.checkBounds(neighbour):
-                    moves.append(neighbour)
+        neighbours = self.getMoves(block.gridPos, depth)
+
+        for neighbour in neighbours:
+            neiX, neiY = neighbour
+            if self.checkBounds(neighbour) and self.blocks[neiY][neiX].particleID == None:
+                moves.append(neighbour)
+            elif excludeOccupied == False and self.checkBounds(neighbour):
+                moves.append(neighbour)
 
         return moves
 
