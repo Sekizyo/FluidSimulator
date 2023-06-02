@@ -1,6 +1,7 @@
 import pygame
 from random import random, randrange
 import numpy as np
+import math
 
 from random import randint
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
@@ -22,6 +23,9 @@ class Position():
             return blocks[y][x]
         else:
             return None
+
+    def getDistance(self, objA, objB):
+        return math.dist(objA, objB)
 
 class Moves(Position):
     def createMoves(self, block, blocks, depth=1, excludeOccupied=True):
@@ -56,6 +60,18 @@ class Moves(Position):
             return False
 
 class Direction(Moves):
+    def normalize(self, value):
+        if value >= 1:
+            value = 1
+        elif 0 <= value < 1:
+            value = 0
+        elif -1 <= value < 0:
+            value = -1
+        elif -1 > value:
+            value = -1
+
+        return value
+
     def refreshBlockAssigment(self, blocks):
         for col in blocks:
             for block in col:
@@ -91,17 +107,14 @@ class Direction(Moves):
         block.direction[0] = self.normalize(block.direction[0] + dirX)
         block.direction[1] = self.normalize(block.direction[1] + dirY)
 
-    def normalize(self, value):
-        if value >= 1:
-            value = 1
-        elif 0 <= value < 1:
-            value = 0
-        elif -1 <= value < 0:
-            value = -1
-        elif -1 > value:
-            value = -1
+class Particle(pygame.sprite.Sprite):
+    def __init__(self, id, gridPos, direction=[0,1], vel=1):
+        super().__init__()
+        self.id = id
 
-        return value
+        self.gridPos = gridPos
+        self.direction = direction
+        self.vel = 1
 
 class Particles(Direction):
     def __init__(self):
@@ -156,15 +169,6 @@ class Particles(Direction):
         block = self.getBlockByGridPos(position, blocks)
         block.particleID = particle.id
 
-class Particle(pygame.sprite.Sprite):
-    def __init__(self, id, gridPos, direction=[0,1], vel=1):
-        super().__init__()
-        self.id = id
-
-        self.gridPos = gridPos
-        self.direction = direction
-        self.vel = 1
-
 class Render():
     def __init__(self, surface):
         self.renderDebug = True
@@ -195,7 +199,7 @@ class Render():
         startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
         
         direction = block.direction
-        strenght = 12
+        strenght = block.pressureStrenght
 
         endPos = [startPos[0]+(direction[0]*strenght) , startPos[1]+(direction[1]*strenght)]
 
@@ -236,4 +240,4 @@ class Block():
         self.size = size
         self.particleID = None
         self.direction = direction
-        self.pressureStrenght = 1
+        self.pressureStrenght = 10
