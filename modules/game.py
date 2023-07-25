@@ -62,7 +62,6 @@ class Game():
         self.grid.renderGrid()
         self.updateFps()
         self.updateParticleCount()
-        self.updateParticleMass()
 
         pygame.display.flip()
 
