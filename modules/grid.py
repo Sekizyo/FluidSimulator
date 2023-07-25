@@ -27,12 +27,15 @@ class Moves(Position):
         moves = []
         startPosX, startPosY = pos
 
-        X = int(depth)
-        for x in range(-X,X+1):
+        for x in range(-depth,depth+1):
             Y = int((depth*depth-x*x)**0.5)
             for y in range(-Y,Y+1):
-                if self.checkBounds((x+startPosX, y+startPosY)):
-                    moves.append(self.blocks[y+startPosY][x+startPosX])
+                
+                x1 = x+startPosX
+                y1 = y+startPosY
+
+                if self.checkBounds((x1, y1)):
+                    moves.append(self.blocks[y1][x1])
         return moves
 
 class Direction(Moves):
@@ -85,7 +88,7 @@ class Diffusion(Moves):
                 if block.particles >= 1:
                     neighbours = self.getMoves(block.gridPos, 2)
                     avg = self.getAverageForBlocks(neighbours)
-                    if avg >= 1:
+                    if avg >= block.density:
                         for neighbour in neighbours:
                             neighbour.particles = avg
 
@@ -151,7 +154,7 @@ class Grid(Render, Diffusion):
             for block in col:
                 block.particles = 0
                 block.color = [0,0,0]
-                
+
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
         self.gridPos = (x, y)
@@ -159,9 +162,12 @@ class Block():
         self.color = [0,0,0]
         self.size = size
         self.particles = 0
-        self.maxParticles = 255
+
+        self.velocity = 0
+        self.density = 10
+        self.temperature = 0
 
     def updateColor(self):
         delta = self.particles
-        if delta < 255: 
+        if 0 <= delta <= 255: 
             self.color = [delta, delta, delta]
