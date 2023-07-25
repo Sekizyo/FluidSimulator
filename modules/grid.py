@@ -22,16 +22,6 @@ class Position():
         else:
             return None
         
-    def getBlockByGridPos1(self, pos):
-        if self.checkBounds(pos):
-            x, y = pos
-            return self.blocks[y][x]
-        else:
-            return None
-
-    def getDistance(self, objA, objB):
-        return dist(objA, objB)
-
 class Moves(Position):
     def createMoves(self, block, depth=1):
         moves = []
@@ -73,11 +63,6 @@ class Direction(Moves):
 
         return value
 
-    def refreshBlockAssigment(self, blocks):
-        for col in blocks:
-            for block in col:
-                block.particleID = None
-
     def refreshBlockDir(self, blocks):
         for col in blocks:
             for block in col:
@@ -108,16 +93,6 @@ class Direction(Moves):
         block.direction[0] = self.normalize(block.direction[0] + dirX)
         block.direction[1] = self.normalize(block.direction[1] + dirY)
 
-class Particles(Direction):
-    def __init__(self):
-        self.particleCount = 0
-        self.particles = []
-
-    def reset(self, blocks):
-        self.particleCount = 0
-        self.particles = []
-        self.refreshBlockDir(blocks)
-
 class Diffusion(Moves):
     def update(self, blocks):
         for col in blocks:
@@ -127,7 +102,7 @@ class Diffusion(Moves):
                     neighbours = self.getBlocksFromMoves(neighboursGridPos)
                     avg = self.getAverageForBlocks(neighbours)
                     if avg >= 1:
-                        for i, neighbour in enumerate(neighbours):
+                        for neighbour in neighbours:
                             neighbour.particles = avg
 
     def getAverageForBlocks(self, blocks):
@@ -136,11 +111,6 @@ class Diffusion(Moves):
             avg += block.particles
         return avg / len(blocks)           
 
-    def sortNeighboursByParticleCount(self, list):
-        blocks = self.getBlocksFromMoves(list)
-        blocks.sort(key=lambda x: x.particles)
-        return blocks
-    
 class Render():
     def switchRenderDebug(self):
         if self.renderDebug == True:
@@ -161,7 +131,7 @@ class Render():
                     block.updateColor()
                     pygame.draw.rect(self.surface, block.color, block.rect)
 
-class Grid(Render, Diffusion, Particles):
+class Grid(Render, Diffusion):
     def __init__(self, surface):
         self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
         self.renderDebug = False
