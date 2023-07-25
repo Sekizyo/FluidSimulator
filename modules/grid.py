@@ -23,22 +23,6 @@ class Position():
             return None
         
 class Moves(Position):
-    def createMoves(self, block, depth=1):
-        moves = []
-        neighbours = self.getMoves(block.gridPos, depth)
-
-        for neighbour in neighbours:
-            if self.checkBounds(neighbour):
-                moves.append(neighbour)
-
-        return moves
-    
-    def getBlocksFromMoves(self, moves):
-        blocks = []
-        for move in moves:
-            blocks.append(self.getBlockByGridPos(move))
-        return blocks
-
     def getMoves(self, pos, depth=1):
         moves = []
         startPosX, startPosY = pos
@@ -47,7 +31,8 @@ class Moves(Position):
         for x in range(-X,X+1):
             Y = int((depth*depth-x*x)**0.5)
             for y in range(-Y,Y+1):
-                moves.append([x+startPosX, y+startPosY])
+                if self.checkBounds((x+startPosX, y+startPosY)):
+                    moves.append(self.blocks[y+startPosY][x+startPosX])
         return moves
 
 class Direction(Moves):
@@ -98,8 +83,7 @@ class Diffusion(Moves):
         for col in blocks:
             for block in col:
                 if block.particles >= 1:
-                    neighboursGridPos = self.createMoves(block, 2)
-                    neighbours = self.getBlocksFromMoves(neighboursGridPos)
+                    neighbours = self.getMoves(block.gridPos, 2)
                     avg = self.getAverageForBlocks(neighbours)
                     if avg >= 1:
                         for neighbour in neighbours:
