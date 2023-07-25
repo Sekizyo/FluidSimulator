@@ -1,34 +1,46 @@
 
 import sys
 import pygame
-from modules import STRESTEST, FONT
+from modules import FONT
 from modules.screen import Screen
 from modules.grid import Grid
 
 class Game():
-    def __init__(self):
+    def __init__(self, testRun=False):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 5
+        self.fps = 60
+        self.avgFps = self.fps
         self.clock = pygame.time.Clock()
-        
+
+        self.testrun = testRun
+        self.testCounter = 0
+
         self.stopRender = False
         self.exit = False
+
+    def kill(self):
+        self.exit = True
     
     def run(self):
         while not self.exit:
             self.clock.tick(self.fps)
-            self.stresTest()
+            self.testRun()
+
             self.logic()
             self.render()
 
-    def stresTest(self):
-        if STRESTEST:
-            self.fps = 60
-            self.grid.renderDebug = False
-            # print("particles: ", sys.getsizeof(self.particles.particles))
-            # print("blocks: ", sys.getsizeof(self.grid.blocks))
+        return self.avgFps
+
+    def testRun(self):
+        if self.testrun:
+            self.avgFps += self.clock.get_fps() 
+            self.testCounter += 1
+            self.grid.addParticleToBlockByPos((500,500))
+            if self.testCounter > 100:
+                self.avgFps = self.avgFps//self.testCounter
+                self.kill()
 
     def logic(self):
         self.controlsKeyboard()
@@ -54,7 +66,7 @@ class Game():
         if pygame.mouse.get_pressed()[0]:
             self.grid.addParticleToBlockByPos(pygame.mouse.get_pos())
         if pygame.mouse.get_pressed()[1]:
-            self.grid.dierction.changeBlockDirections(pygame.mouse.get_pos())
+            self.grid.changeBlockDirections(pygame.mouse.get_pos())
 
     def render(self):
         self.screen.surface.fill("black")
