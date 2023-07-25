@@ -17,10 +17,17 @@ class Position():
         x, y = pos
         return x//BLOCKSIZE, y//BLOCKSIZE
 
-    def getBlockByGridPos(self, pos, blocks):
+    def getBlockByGridPos(self, pos):
         if self.checkBounds(pos):
             x, y = pos
-            return blocks[y][x]
+            return self.blocks[y][x]
+        else:
+            return None
+        
+    def getBlockByGridPos1(self, pos):
+        if self.checkBounds(pos):
+            x, y = pos
+            return self.blocks[y][x]
         else:
             return None
 
@@ -28,18 +35,21 @@ class Position():
         return math.dist(objA, objB)
 
 class Moves(Position):
-    def createMoves(self, block, blocks, depth=1, excludeOccupied=True):
+    def createMoves(self, block, depth=1):
         moves = []
         neighbours = self.getMoves(block.gridPos, depth)
 
         for neighbour in neighbours:
             if self.checkBounds(neighbour):
-                if self.checkIfOccupied(neighbour, blocks, excludeOccupied): 
-                    moves.append(neighbour)
-                else:
-                    moves.append(neighbour)
+                moves.append(neighbour)
 
         return moves
+    
+    def getBlocksFromMoves(self, moves):
+        blocks = []
+        for move in moves:
+            blocks.append(self.getBlockByGridPos(move))
+        return blocks
 
     def getMoves(self, pos, depth=1):
         moves = []
@@ -51,13 +61,6 @@ class Moves(Position):
             for y in range(-Y,Y+1):
                 moves.append([x+startPosX, y+startPosY])
         return moves
-
-    def checkIfOccupied(self, pos, blocks, excludeOccupied=True):
-        x, y = pos
-        if excludeOccupied and blocks[y][x].particleID == None:
-            return True
-        else:
-            return False
 
 class Direction(Moves):
     def normalize(self, value):
@@ -88,7 +91,7 @@ class Direction(Moves):
         self.changeBlocksDirectionsInRadius(block)
 
     def changeBlocksDirectionsInRadius(self, center, blocks, radius = 3):
-        moves = self.createMoves(center, blocks, radius, False)
+        moves = self.createMoves(center, radius, False)
         for gridPos in moves:
             self.changeBlockDirection(gridPos, center, blocks)
 
@@ -107,73 +110,36 @@ class Direction(Moves):
         block.direction[0] = self.normalize(block.direction[0] + dirX)
         block.direction[1] = self.normalize(block.direction[1] + dirY)
 
-class Particle(pygame.sprite.Sprite):
-    def __init__(self, id, gridPos, direction=[0,1], vel=1):
-        super().__init__()
-        self.id = id
-
-        self.gridPos = gridPos
-        self.direction = direction
-        self.vel = 1
-
 class Particles(Direction):
     def __init__(self):
         self.particleCount = 0
         self.particles = []
-        self.create()
-
-    def create(self, amount=1):
-        self.particleCount += amount
-
-        for i in range(amount):
-            gridPos = [randrange(0,WIDTHBLOCKS), randrange(0,HEIGHTBLOCKS)]
-
-            particle = Particle(len(self.particles)+1, gridPos)
-
-            self.particles.append(particle)
-    
-    def createAtPos(self, pos):
-        x, y = pos
-        gridPos = [x//BLOCKSIZE, y//BLOCKSIZE]
-        particle = Particle(len(self.particles)+1, gridPos)
-
-        self.particleCount += 1
-        self.particles.append(particle)
 
     def reset(self, blocks):
         self.particleCount = 0
         self.particles = []
         self.refreshBlockDir(blocks)
-        self.create(1)
 
-    def moveParticles(self, blocks):
-        self.refreshBlockAssigment(blocks)
-        for particle in self.particles:
-            moves = self.createMoves(particle, blocks, 1, True)
-            self.moveParticle(particle, moves, blocks)
+class Diffusion(Moves):
+    def update(self, blocks):
+        for col in blocks:
+            for block in col:
+                if block.particles > 1:
+                    percentageParticles = block.particles//2
+                    block.particles -= percentageParticles
 
-    def moveParticle(self, particle, moves, blocks):
-        positionStart = particle.gridPos
-        block = self.getBlockByGridPos(positionStart, blocks)
-        position = [positionStart[0] + block.direction[0], positionStart[1] + block.direction[1]]
-        if self.checkBounds(position):
-            if position in moves:
-                self.assignParticleToBlockByPos(particle, position, blocks)
-                self.changeBlocksDirectionsInRadius(block, blocks)
-        else:
-            self.assignParticleToBlockByPos(particle, positionStart, blocks)
-            self.changeBlocksDirectionsInRadius(block, blocks)
+                    neighbours = self.createMoves(block)
+                    neighboursSorted = self.sortNeighboursByParticleCount(neighbours)
+                    for i, neighbour in enumerate(neighboursSorted):
+                        delta = percentageParticles
+                        neighbour.particles += delta
 
-    def assignParticleToBlockByPos(self, particle, position, blocks):
-        particle.gridPos = position
-        block = self.getBlockByGridPos(position, blocks)
-        block.particleID = particle.id
-
+    def sortNeighboursByParticleCount(self, list):
+        blocks = self.getBlocksFromMoves(list)
+        blocks.sort(key=lambda x: x.particles)
+        return blocks
+    
 class Render():
-    def __init__(self, surface):
-        self.renderDebug = True
-        self.surface = surface
-
     def switchRenderDebug(self):
         if self.renderDebug == True:
             self.renderDebug = False
@@ -183,35 +149,25 @@ class Render():
     def render(self, blocks):
         for col in blocks:
             for block in col:
-                if block.particleID:
-                    pygame.draw.rect(self.surface, (100,100,100), block.rect, 0)
-                
                 if self.renderDebug:
+                    block.updateColor()
                     pygame.draw.rect(self.surface, block.color, block.rect, 1)
                 
-                    startPos, endPos = self.getPressureArrowVector(block)
-                    pygame.draw.line(self.surface, block.color, startPos, endPos, 1)
-
                     idText = FONT.render(str(block.gridPos), 1, block.color)
                     pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
    
-    def getPressureArrowVector(self, block):
-        startPos = [block.rect[0] + block.size//2 , block.rect[1] + block.size//2]
-        
-        direction = block.direction
-        strenght = block.pressureStrenght
-
-        endPos = [startPos[0]+(direction[0]*strenght) , startPos[1]+(direction[1]*strenght)]
-
-        return startPos, endPos
-
-class Grid():
+class Grid(Render, Diffusion, Particles):
     def __init__(self, surface):
-        self.render = Render(surface)
-        self.particles = Particles()
-        
         self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
+        self.renderDebug = True
+        self.surface = surface
         self.createBlocks()
+
+    def addParticleToBlockByPos(self, mouse):
+        gridPos = self.getGridPosFromPos(mouse)
+        block = self.getBlockByGridPos(gridPos)
+        block.particles += 1
+        print(block.particles)
 
     def createBlocks(self):
         tempY = []
@@ -224,20 +180,21 @@ class Grid():
         self.blocks = tempY
 
     def renderGrid(self):
-        self.render.render(self.blocks)
-
-    def reset(self):
-        self.particles.reset(self.blocks)
+        self.render(self.blocks)
 
     def loop(self):
-        self.particles.moveParticles(self.blocks)
+        self.update(self.blocks)
 
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
-        self.color = (255,255,255)
+        self.color = [255,255,255]
         self.size = size
-        self.particleID = None
-        self.direction = direction
-        self.pressureStrenght = 10
+        self.particles = 0
+        self.maxParticles = 255
+
+    def updateColor(self):
+        delta = self.color[0]-self.particles
+        if delta > 0: 
+            self.color[0] = delta
