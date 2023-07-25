@@ -172,7 +172,7 @@ class Render():
 class Grid(Render, Diffusion, Particles):
     def __init__(self, surface):
         self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
-        self.renderDebug = True
+        self.renderDebug = False
         self.surface = surface
         self.particleCount = 0
         self.createBlocks()
