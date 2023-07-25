@@ -10,7 +10,7 @@ class Game():
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 10
+        self.fps = 5
         self.clock = pygame.time.Clock()
         
         self.stopRender = False
@@ -34,8 +34,7 @@ class Game():
     def stresTest(self):
         if STRESTEST:
             self.fps = 60
-            self.particles.create(1)
-            self.grid.render.renderDebug = False
+            self.grid.renderDebug = False
             # print("particles: ", sys.getsizeof(self.particles.particles))
             # print("blocks: ", sys.getsizeof(self.grid.blocks))
 
@@ -52,8 +51,8 @@ class Game():
             self.grid.render.switchRenderDebug()
         if pygame.key.get_pressed()[pygame.K_SPACE] == True:
             self.switchStopRender()
-        # if pygame.key.get_pressed()[pygame.K_r] == True:
-        #     self.grid.reset()
+        if pygame.key.get_pressed()[pygame.K_r] == True:
+            self.grid.reset()
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:
@@ -68,7 +67,8 @@ class Game():
         self.screen.surface.fill("black")
 
         self.updateFps()
-        # self.updateParticleCount()
+        self.updateParticleCount()
+        self.updateParticleMass()
         self.grid.renderGrid()
 
         pygame.display.flip()
@@ -81,9 +81,13 @@ class Game():
 
     def updateFps(self):
         fps = str(int(self.clock.get_fps()))
-        fps_text = FONT.render(fps, 1, pygame.Color("coral"))
+        fps_text = FONT.render(fps, 4, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCount(self):
-        particleText = FONT.render(str(self.grid.particles.particleCount), 1, pygame.Color("coral"))
+        particleText = FONT.render(str(self.grid.particleCount), 4, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (30,0))
+
+    def updateParticleMass(self):
+        particleText = FONT.render(str(self.grid.getTotalMass()), 4, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, particleText, (50,0))

@@ -124,7 +124,7 @@ class Diffusion(Moves):
     def update(self, blocks):
         for col in blocks:
             for block in col:
-                if block.particles > 1:
+                if block.particles:
                     neighboursGridPos = self.createMoves(block)
                     neighbours = self.getBlocksFromMoves(neighboursGridPos)
                     avg = self.getAverageForBlocks(neighbours)
@@ -132,11 +132,19 @@ class Diffusion(Moves):
                     for i, neighbour in enumerate(neighbours):
                         neighbour.particles = avg
 
+    def getTotalMass(self):
+        mass = 0
+        for col in self.blocks:
+            for block in col:
+                mass += block.particles
+        
+        return mass
+
     def getAverageForBlocks(self, blocks):
         avg = 0
         for block in blocks:
             avg += block.particles
-        return avg / len(blocks)            
+        return avg / len(blocks)           
 
     def sortNeighboursByParticleCount(self, list):
         blocks = self.getBlocksFromMoves(list)
@@ -155,26 +163,27 @@ class Render():
             for block in col:
                 if self.renderDebug:
                     block.updateColor()
-                    pygame.draw.rect(self.surface, block.color, block.rect, 1)
+                    # pygame.draw.rect(self.surface, block.color, block.rect, 1)
                 
-                    idText = FONT.render(str(block.gridPos), 1, block.color)
-                    pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
+                    # idText = FONT.render(str(block.gridPos), 1, block.color)
+                    # pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
                     
                     particlesText = FONT.render(str(block.particles), 1, block.color)
-                    pygame.Surface.blit(self.surface, particlesText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-20)))
+                    pygame.Surface.blit(self.surface, particlesText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
    
 class Grid(Render, Diffusion, Particles):
     def __init__(self, surface):
         self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
         self.renderDebug = True
         self.surface = surface
+        self.particleCount = 0
         self.createBlocks()
 
     def addParticleToBlockByPos(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
         block.particles += 1
-        print(block.particles)
+        self.particleCount += 1
 
     def createBlocks(self):
         tempY = []
@@ -192,6 +201,11 @@ class Grid(Render, Diffusion, Particles):
     def loop(self):
         self.update(self.blocks)
 
+    def reset(self):
+        self.particleCount = 0
+        for col in self.blocks:
+            for block in col:
+                block.particles = 0
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
         self.gridPos = (x, y)
