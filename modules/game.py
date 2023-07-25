@@ -48,9 +48,7 @@ class Game():
         # if pygame.key.get_pressed()[pygame.K_1] == True:
         #     self.grid.particles.create(1)
         if pygame.key.get_pressed()[pygame.K_2] == True:
-            self.grid.render.switchRenderDebug()
-        if pygame.key.get_pressed()[pygame.K_SPACE] == True:
-            self.switchStopRender()
+            self.grid.switchRenderDebug()
         if pygame.key.get_pressed()[pygame.K_r] == True:
             self.grid.reset()
 
@@ -61,9 +59,6 @@ class Game():
             self.grid.dierction.changeBlockDirections(pygame.mouse.get_pos())
 
     def render(self):
-        if self.stopRender:
-            return
-
         self.screen.surface.fill("black")
 
         self.updateFps()
@@ -73,21 +68,15 @@ class Game():
 
         pygame.display.flip()
 
-    def switchStopRender(self):
-        if self.stopRender == True:
-            self.stopRender = False
-        elif self.stopRender == False:
-            self.stopRender = True
-
     def updateFps(self):
         fps = str(int(self.clock.get_fps()))
         fps_text = FONT.render(fps, 4, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCount(self):
-        particleText = FONT.render(str(self.grid.particleCount), 4, pygame.Color("coral"))
-        pygame.Surface.blit(self.screen.surface, particleText, (30,0))
+        particleText = FONT.render(str(self.grid.particleCount), 8, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, particleText, (50,0))
 
     def updateParticleMass(self):
-        particleText = FONT.render(str(self.grid.getTotalMass()), 4, pygame.Color("coral"))
-        pygame.Surface.blit(self.screen.surface, particleText, (50,0))
+        particleText = FONT.render(str(self.grid.getTotalMass()), 8, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, particleText, (100,0))

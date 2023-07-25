@@ -124,13 +124,13 @@ class Diffusion(Moves):
     def update(self, blocks):
         for col in blocks:
             for block in col:
-                if block.particles:
-                    neighboursGridPos = self.createMoves(block)
+                if block.particles >= 1:
+                    neighboursGridPos = self.createMoves(block, 2)
                     neighbours = self.getBlocksFromMoves(neighboursGridPos)
                     avg = self.getAverageForBlocks(neighbours)
-                    block.particles = avg
-                    for i, neighbour in enumerate(neighbours):
-                        neighbour.particles = avg
+                    if avg >= 1:
+                        for i, neighbour in enumerate(neighbours):
+                            neighbour.particles = avg
 
     def getTotalMass(self):
         mass = 0
@@ -162,15 +162,15 @@ class Render():
         for col in blocks:
             for block in col:
                 if self.renderDebug:
-                    block.updateColor()
-                    # pygame.draw.rect(self.surface, block.color, block.rect, 1)
-                
-                    # idText = FONT.render(str(block.gridPos), 1, block.color)
-                    # pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
+                    idText = FONT.render(str(block.gridPos), 1, block.color)
+                    pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
                     
-                    particlesText = FONT.render(str(block.particles), 1, block.color)
+                    particlesText = FONT.render(str(round(block.particles, 2)), 1, block.color)
                     pygame.Surface.blit(self.surface, particlesText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
-   
+                else:
+                    block.updateColor()
+                    pygame.draw.rect(self.surface, block.color, block.rect)
+
 class Grid(Render, Diffusion, Particles):
     def __init__(self, surface):
         self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
@@ -182,8 +182,8 @@ class Grid(Render, Diffusion, Particles):
     def addParticleToBlockByPos(self, mouse):
         gridPos = self.getGridPosFromPos(mouse)
         block = self.getBlockByGridPos(gridPos)
-        block.particles += 1
-        self.particleCount += 1
+        block.particles += 10000
+        self.particleCount += 10000
 
     def createBlocks(self):
         tempY = []
@@ -206,16 +206,18 @@ class Grid(Render, Diffusion, Particles):
         for col in self.blocks:
             for block in col:
                 block.particles = 0
+                block.color = [0,0,0]
+                
 class Block():
     def __init__(self, x=0, y=0, size=1, direction = [0, 1]):
         self.gridPos = (x, y)
         self.rect = pygame.Rect(x*size, y*size, size, size)
-        self.color = [255,255,255]
+        self.color = [0,0,0]
         self.size = size
         self.particles = 0
         self.maxParticles = 255
 
     def updateColor(self):
-        delta = self.color[0]-self.particles
-        if delta > 0: 
-            self.color[0] = delta
+        delta = self.particles
+        if delta < 255: 
+            self.color = [delta, delta, delta]
