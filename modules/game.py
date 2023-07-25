@@ -19,17 +19,9 @@ class Game():
     def run(self):
         while not self.exit:
             self.clock.tick(self.fps)
+            self.stresTest()
             self.logic()
             self.render()
-
-    def logic(self):
-        self.controlsKeyboard()
-        self.controlsMouse()
-
-        if self.stopRender: return
-            
-        self.stresTest()
-        self.grid.loop()
 
     def stresTest(self):
         if STRESTEST:
@@ -37,6 +29,12 @@ class Game():
             self.grid.renderDebug = False
             # print("particles: ", sys.getsizeof(self.particles.particles))
             # print("blocks: ", sys.getsizeof(self.grid.blocks))
+
+    def logic(self):
+        self.controlsKeyboard()
+        self.controlsMouse()
+
+        self.grid.loop()
 
     def controlsKeyboard(self):
         for event in pygame.event.get():
@@ -61,22 +59,22 @@ class Game():
     def render(self):
         self.screen.surface.fill("black")
 
+        self.grid.renderGrid()
         self.updateFps()
         self.updateParticleCount()
         self.updateParticleMass()
-        self.grid.renderGrid()
 
         pygame.display.flip()
 
     def updateFps(self):
         fps = str(int(self.clock.get_fps()))
-        fps_text = FONT.render(fps, 4, pygame.Color("coral"))
+        fps_text = FONT.render(fps, 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCount(self):
-        particleText = FONT.render(str(self.grid.particleCount), 8, pygame.Color("coral"))
+        particleText = FONT.render(str(self.grid.particleCount), 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (50,0))
 
     def updateParticleMass(self):
-        particleText = FONT.render(str(self.grid.getTotalMass()), 8, pygame.Color("coral"))
+        particleText = FONT.render(str(self.grid.getTotalMass()), 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (100,0))
