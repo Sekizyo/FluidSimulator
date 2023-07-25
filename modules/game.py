@@ -85,7 +85,3 @@ class Game():
     def updateParticleCount(self):
         particleText = FONT.render(str(self.grid.particleCount), 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (50,0))
-
-    def updateParticleMass(self):
-        particleText = FONT.render(str(self.grid.getTotalMass()), 100, pygame.Color("coral"))
-        pygame.Surface.blit(self.screen.surface, particleText, (100,0))

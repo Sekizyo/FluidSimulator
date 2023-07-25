@@ -130,14 +130,6 @@ class Diffusion(Moves):
                         for i, neighbour in enumerate(neighbours):
                             neighbour.particles = avg
 
-    def getTotalMass(self):
-        mass = 0
-        for col in self.blocks:
-            for block in col:
-                mass += block.particles
-        
-        return mass
-
     def getAverageForBlocks(self, blocks):
         avg = 0
         for block in blocks:
