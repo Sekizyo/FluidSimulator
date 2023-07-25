@@ -1,9 +1,7 @@
 import pygame
-from random import random, randrange
 import numpy as np
-import math
+from math import dist
 
-from random import randint
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
 
 class Position():
@@ -32,7 +30,7 @@ class Position():
             return None
 
     def getDistance(self, objA, objB):
-        return math.dist(objA, objB)
+        return dist(objA, objB)
 
 class Moves(Position):
     def createMoves(self, block, depth=1):
