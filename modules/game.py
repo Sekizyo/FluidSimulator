@@ -46,19 +46,19 @@ class Game():
 
         if pygame.key.get_pressed()[pygame.K_ESCAPE] == True:
             self.exit = True
-        if pygame.key.get_pressed()[pygame.K_1] == True:
-            self.grid.particles.create(1)
+        # if pygame.key.get_pressed()[pygame.K_1] == True:
+        #     self.grid.particles.create(1)
         if pygame.key.get_pressed()[pygame.K_2] == True:
             self.grid.render.switchRenderDebug()
         if pygame.key.get_pressed()[pygame.K_SPACE] == True:
             self.switchStopRender()
-        if pygame.key.get_pressed()[pygame.K_r] == True:
-            self.grid.reset()
+        # if pygame.key.get_pressed()[pygame.K_r] == True:
+        #     self.grid.reset()
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:
-            self.grid.particles.createAtPos(pygame.mouse.get_pos())
-        elif pygame.mouse.get_pressed()[1]:
+            self.grid.addParticleToBlockByPos(pygame.mouse.get_pos())
+        if pygame.mouse.get_pressed()[1]:
             self.grid.dierction.changeBlockDirections(pygame.mouse.get_pos())
 
     def render(self):
@@ -68,7 +68,7 @@ class Game():
         self.screen.surface.fill("black")
 
         self.updateFps()
-        self.updateParticleCount()
+        # self.updateParticleCount()
         self.grid.renderGrid()
 
         pygame.display.flip()

@@ -125,14 +125,18 @@ class Diffusion(Moves):
         for col in blocks:
             for block in col:
                 if block.particles > 1:
-                    percentageParticles = block.particles//2
-                    block.particles -= percentageParticles
+                    neighboursGridPos = self.createMoves(block)
+                    neighbours = self.getBlocksFromMoves(neighboursGridPos)
+                    avg = self.getAverageForBlocks(neighbours)
+                    block.particles = avg
+                    for i, neighbour in enumerate(neighbours):
+                        neighbour.particles = avg
 
-                    neighbours = self.createMoves(block)
-                    neighboursSorted = self.sortNeighboursByParticleCount(neighbours)
-                    for i, neighbour in enumerate(neighboursSorted):
-                        delta = percentageParticles
-                        neighbour.particles += delta
+    def getAverageForBlocks(self, blocks):
+        avg = 0
+        for block in blocks:
+            avg += block.particles
+        return avg / len(blocks)            
 
     def sortNeighboursByParticleCount(self, list):
         blocks = self.getBlocksFromMoves(list)
@@ -155,6 +159,9 @@ class Render():
                 
                     idText = FONT.render(str(block.gridPos), 1, block.color)
                     pygame.Surface.blit(self.surface, idText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-10)))
+                    
+                    particlesText = FONT.render(str(block.particles), 1, block.color)
+                    pygame.Surface.blit(self.surface, particlesText, (block.rect[0]+(block.size//4), block.rect[1]+(block.size//2-20)))
    
 class Grid(Render, Diffusion, Particles):
     def __init__(self, surface):
