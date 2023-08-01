@@ -1,5 +1,5 @@
 import pygame
-import numpy as np
+import numpy
 from math import dist
 
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
@@ -7,7 +7,7 @@ from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
 class Position():
     def checkBounds(self, pos):
         x, y = pos
-        if (0 <= x <= WIDTHBLOCKS-1) and (0 <= y <= HEIGHTBLOCKS-1):
+        if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
             return True
         return False
 
@@ -34,7 +34,7 @@ class Moves(Position):
                 x1 = x+startPosX
                 y1 = y+startPosY
 
-                if self.checkBounds((x1, y1)):
+                if (0 <= x1 < WIDTHBLOCKS) and (0 <= y1 < HEIGHTBLOCKS):
                     moves.append(self.blocks[y1][x1])
         return moves
 
@@ -120,7 +120,7 @@ class Render():
 
 class Grid(Render, Diffusion):
     def __init__(self, surface):
-        self.blocks = np.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
+        self.blocks = numpy.arange(WIDTHBLOCKS*HEIGHTBLOCKS).reshape(HEIGHTBLOCKS, WIDTHBLOCKS)
         self.renderDebug = False
         self.surface = surface
         self.particleCount = 0
