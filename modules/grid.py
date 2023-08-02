@@ -68,21 +68,11 @@ class Render():
                 pygame.draw.rect(self.surface, color, rect)
 
     def getColor(self, nparticles):
-        nrange = self.normalize(nparticles)
-        if nrange > 255:
-            return [255,255,255]
+        delta = nparticles
+        if delta > 255: 
+            return [255, 255, 255]
         else:
-            return [nrange, 0, 0]
-    
-    def normalize(self, value):
-        old_value = value
-        old_min = 0
-        old_max = 1000
-        new_min = 0
-        new_max = 255
-
-        new_value = ( (old_value - old_min) / (old_max - old_min) ) * (new_max - new_min) + new_min
-        return int(new_value)
+            return [delta, delta, delta]
 
 class Grid(Render, Diffusion):
     def __init__(self, surface):
