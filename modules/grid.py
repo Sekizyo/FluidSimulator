@@ -16,17 +16,10 @@ class Position():
         x, y = pos
         return x//BLOCKSIZE, y//BLOCKSIZE
 
-    def getBlockByGridPos(self, pos):
-        if self.checkBounds(pos):
-            x, y = pos
-            return self.blocks[y][x]
-        else:
-            return None
-        
 class Moves(Position):
-    def getMoves(self, pos, depth=1):
+    def getMoves(self, x, y, depth=1):
         moves = []
-        startPosX, startPosY = pos
+        startPosX, startPosY = x, y
 
         for x in range(-depth,depth+1):
             Y = int((depth*depth-x*x)**0.5)
@@ -49,30 +42,34 @@ class Moves(Position):
         return sum(list) / len(list)    
 
 class Diffusion(Moves):
+    def updateBlock(self, block, x, y):
+        if block >= 1:
+            neighboursPos = self.getMoves(x, y, 1)
+            values = self.getValuesFromPos(neighboursPos)
+            avg = self.getAverageForList(values)
+            for x, y in neighboursPos:
+                self.blocks[y][x] = avg
+
+
     def update(self, blocks):
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
-                if block >= 1:
-                    neighboursPos = self.getMoves((x, y), 1)
-                    values = self.getValuesFromPos(neighboursPos)
-                    avg = self.getAverageForList(values)
-                    for x, y in neighboursPos:
-                        self.blocks[y][x] = avg
+                self.updateBlock(block, x, y)
 
 class Render():
-    def render(self, blockRect, blocks):
-        for y, col in enumerate(blockRect):
-            for x, rect in enumerate(col):
-                nparticles = blocks[y][x]
-                color = self.getColor(nparticles)
-                pygame.draw.rect(self.surface, color, rect)
-
     def getColor(self, nparticles):
         delta = nparticles
         if delta > 255: 
             return [255, 255, 255]
         else:
             return [delta, delta, delta]
+        
+    def render(self, blockRect, blocks):
+        for y, col in enumerate(blockRect):
+            for x, rect in enumerate(col):
+                nparticles = blocks[y][x]
+                color = self.getColor(nparticles)
+                pygame.draw.rect(self.surface, color, rect)
 
 class Grid(Render, Diffusion):
     def __init__(self, surface):
@@ -85,11 +82,6 @@ class Grid(Render, Diffusion):
         self.particleCount = 0
         self.createBlocks()
 
-    def addParticleToBlockByPos(self, mouse):
-        x, y = self.getGridPosFromPos(mouse)
-        self.blocks[y][x] += 10000
-        self.particleCount += 10000
-
     def createBlocks(self):
         for y in range(HEIGHTBLOCKS):
             tempX = []
@@ -101,6 +93,11 @@ class Grid(Render, Diffusion):
             self.blocks.append(tempX)
             self.blockRect.append(tempXRect)
 
+    def addParticleToBlockByPos(self, mouse):
+        x, y = self.getGridPosFromPos(mouse)
+        self.blocks[y][x] += 10000
+        self.particleCount += 10000
+
     def renderGrid(self):
         self.render(self.blockRect, self.blocks)
 
@@ -109,8 +106,7 @@ class Grid(Render, Diffusion):
 
     def reset(self):
         self.blocks = []
-        self.blocksRect = []
-
+        self.blockRect = []
         self.particleCount = 0
 
         self.createBlocks()
