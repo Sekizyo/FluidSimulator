@@ -24,6 +24,7 @@ change in "__init__.py"
     BLOCKSIZE = 10 - Scale block size, it greatly influences prerformance. Optimal values: 8 - 25
 
     DEPTH = 1 - Optimal values: 1-2 
+    VISCOSITY = 1 - its resistance to deformation at a given rate. Lower value more likely to spread. Optimal values: 1-100
 
     PARTICLESPERCLICK = 10000 - Optimal values: depends on BLOCKSIZE
 

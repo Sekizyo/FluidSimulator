@@ -1,6 +1,6 @@
 import pygame
 
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, PARTICLESPERCLICK
+from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, VISCOSITY, PARTICLESPERCLICK
 
 class Position():
     def checkBounds(self, pos):
@@ -42,12 +42,11 @@ class Moves(Position):
 
 class Diffusion(Moves):
     def updateBlock(self, block, x, y):
-        if block >= 1:
+        if block >= VISCOSITY:
             neighboursPos = self.getMoves(x, y, DEPTH)
             values = self.getValuesFromPos(neighboursPos)
             avg = self.getAverageForList(values)
             for x, y in neighboursPos:
-
                 if self.blocks[y][x] != -1:
                     self.blocks[y][x] = avg
 
