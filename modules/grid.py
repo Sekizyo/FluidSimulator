@@ -1,6 +1,6 @@
 import pygame
 
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
+from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, PARTICLESPERCLICK
 
 class Position():
     def checkBounds(self, pos):
@@ -43,7 +43,7 @@ class Moves(Position):
 class Diffusion(Moves):
     def updateBlock(self, block, x, y):
         if block >= 1:
-            neighboursPos = self.getMoves(x, y, 1)
+            neighboursPos = self.getMoves(x, y, DEPTH)
             values = self.getValuesFromPos(neighboursPos)
             avg = self.getAverageForList(values)
             for x, y in neighboursPos:
@@ -98,8 +98,8 @@ class Grid(Render, Diffusion):
 
     def addParticle(self, mouse):
         x, y = self.getGridPosFromPos(mouse)
-        self.blocks[y][x] += 10000
-        self.particleCount += 10000
+        self.blocks[y][x] += PARTICLESPERCLICK
+        self.particleCount += PARTICLESPERCLICK
 
     def addWall(self, mouse):
         x, y = self.getGridPosFromPos(mouse)
