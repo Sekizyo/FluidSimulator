@@ -1,5 +1,4 @@
 
-import sys
 import pygame
 from modules import FONT
 from modules.screen import Screen
