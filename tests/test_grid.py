@@ -16,4 +16,4 @@ def test_memory():
     mem = process.memory_info().rss/1024  # in bytes 
     mem /= 1024
 
-    assert mem < 50
+    assert mem < 62

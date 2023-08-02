@@ -1,9 +1,6 @@
 import pygame
-import numpy
-from math import dist
-from random import randrange
 
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, FONT
+from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS
 
 class Position():
     def checkBounds(self, pos):
