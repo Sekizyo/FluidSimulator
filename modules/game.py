@@ -24,7 +24,9 @@ class Logic():
 
     def controlsMouse(self):
         if pygame.mouse.get_pressed()[0]:
-            self.grid.addParticleToBlockByPos(pygame.mouse.get_pos())
+            self.grid.addParticle(pygame.mouse.get_pos())
+        if pygame.mouse.get_pressed()[2]:
+            self.grid.addWall(pygame.mouse.get_pos())
 
 class Render():
     def render(self):
@@ -73,7 +75,7 @@ class Game(Logic, Render):
         if self.testrun:
             self.avgFps += self.clock.get_fps() 
             self.testCounter += 1
-            self.grid.addParticleToBlockByPos((500,500))
+            self.grid.addParticle((500,500))
             if self.testCounter > 100:
                 self.avgFps = self.avgFps//self.testCounter
                 self.kill()

@@ -25,14 +25,16 @@ class Moves(Position):
                 x1 = x+startPosX
                 y1 = y+startPosY
 
-                if (0 <= x1 < WIDTHBLOCKS) and (0 <= y1 < HEIGHTBLOCKS):
+                if (0 <= x1 < WIDTHBLOCKS) and (0 <= y1 < HEIGHTBLOCKS) and self.blocks != -1:
                     moves.append((x1, y1))
         return moves
     
     def getValuesFromPos(self, pos):
         values = []
         for x, y in pos:
-            values.append(self.blocks[y][x])
+            val = self.blocks[y][x]
+            if val >= 0:
+                values.append(self.blocks[y][x])
         return values
     
     def getAverageForList(self, list):
@@ -45,8 +47,9 @@ class Diffusion(Moves):
             values = self.getValuesFromPos(neighboursPos)
             avg = self.getAverageForList(values)
             for x, y in neighboursPos:
-                self.blocks[y][x] = avg
 
+                if self.blocks[y][x] != -1:
+                    self.blocks[y][x] = avg
 
     def update(self, blocks):
         for y, col in enumerate(blocks):
@@ -65,8 +68,11 @@ class Render():
         for y, col in enumerate(blockRect):
             for x, rect in enumerate(col):
                 nparticles = blocks[y][x]
-                color = self.getColor(nparticles)
-                pygame.draw.rect(self.surface, color, rect)
+                if nparticles >= 0:
+                    color = self.getColor(nparticles)
+                    pygame.draw.rect(self.surface, color, rect)
+                else:
+                    pygame.draw.rect(self.surface, [255, 0, 0], rect)
 
 class Grid(Render, Diffusion):
     def __init__(self, surface):
@@ -90,10 +96,14 @@ class Grid(Render, Diffusion):
             self.blocks.append(tempX)
             self.blockRect.append(tempXRect)
 
-    def addParticleToBlockByPos(self, mouse):
+    def addParticle(self, mouse):
         x, y = self.getGridPosFromPos(mouse)
         self.blocks[y][x] += 10000
         self.particleCount += 10000
+
+    def addWall(self, mouse):
+        x, y = self.getGridPosFromPos(mouse)
+        self.blocks[y][x] = -1
 
     def renderGrid(self):
         self.render(self.blockRect, self.blocks)
