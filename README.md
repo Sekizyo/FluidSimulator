@@ -1,10 +1,9 @@
-### Features
-- Pure pygame
-- Uses only dyfiusion
 
-### Images
+### Demo
 
-![](https://pandao.github.io/editor.md/examples/images/4.jpg)   
+![](https://github.com/Sekizyo/FluidSimulator/blob/bcc459f5174421ac359dfb098ebaa00560bfdec1/recources/demo1.mp4)   
+
+![](https://github.com/Sekizyo/FluidSimulator/blob/bcc459f5174421ac359dfb098ebaa00560bfdec1/recources/demo2.mp4)   
 
 ### How to use
 
