@@ -5,7 +5,7 @@ from modules.screen import Screen
 from modules.grid import Grid
 
 class Render():
-    def render(self):
+    def render(self) -> None:
         self.screen.surface.fill("black")
 
         self.grid.render()
@@ -14,23 +14,23 @@ class Render():
 
         pygame.display.flip()
 
-    def updateFps(self):
+    def updateFps(self) -> None:
         fps = str(int(self.clock.get_fps()))
         fps_text = FONT.render(f"Fps: {fps}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
-    def updateParticleCounter(self):
+    def updateParticleCounter(self) -> None:
         particleText = FONT.render(f"Particles: {str(self.grid.particleCounter)}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
 class Logic():
-    def logic(self):
+    def logic(self) -> None:
         self.controlsKeyboard()
         self.controlsMouse()
 
         self.grid.logic()
 
-    def controlsKeyboard(self):
+    def controlsKeyboard(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.exit = True
@@ -40,14 +40,14 @@ class Logic():
         if pygame.key.get_pressed()[pygame.K_r] == True:
             self.grid.reset()
 
-    def controlsMouse(self):
+    def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
             self.grid.addParticle(pygame.mouse.get_pos())
         if pygame.mouse.get_pressed()[2]:
             self.grid.addWall(pygame.mouse.get_pos())
 
 class Tests():
-    def testRun(self, test=False):
+    def testRun(self, test=False) -> None:
         if test:
             self.avgFps += self.clock.get_fps() 
             self.testCounter += 1
@@ -57,11 +57,11 @@ class Tests():
                 self.avgFps = self.avgFps//self.testCounter
                 self.kill()
 
-    def kill(self):
+    def kill(self) -> None:
         self.exit = True
 
 class Game(Render, Logic, Tests):
-    def __init__(self, testRun=False):
+    def __init__(self, testRun: bool=False) -> None:
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
@@ -73,7 +73,7 @@ class Game(Render, Logic, Tests):
         self.testCounter = 0
         self.exit = False
 
-    def run(self):
+    def run(self) -> int:
         while not self.exit:
             self.clock.tick(self.fps)
             self.testRun(self.isTestRun)

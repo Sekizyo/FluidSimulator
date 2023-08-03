@@ -3,20 +3,20 @@ import pygame
 from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, VISCOSITY, PARTICLESPERCLICK
 
 class Render():
-    def renderGrid(self, blockRect, blocks):
+    def renderGrid(self, blockRect: list[pygame.Rect], blocks: list[int]) -> None:
         for y, col in enumerate(blockRect):
             for x, rect in enumerate(col):
                 nparticles = blocks[y][x]
                 self.renderBlock(nparticles, rect)
 
-    def renderBlock(self, nparticles, rect):
+    def renderBlock(self, nparticles: int, rect: list[pygame.Rect]) -> None:
         if nparticles >= 0:
             color = self.getColor(nparticles)
             pygame.draw.rect(self.surface, color, rect)
         else:
             pygame.draw.rect(self.surface, [255, 0, 0], rect)
 
-    def getColor(self, nparticles):
+    def getColor(self, nparticles: int) -> list[int]:
         delta = nparticles
         if delta > 255: 
             return [255, 255, 255]
@@ -24,28 +24,28 @@ class Render():
             return [delta, delta, delta]
 
 class Position():
-    def checkBounds(self, x, y):
+    def checkBounds(self, x: int, y: int) -> bool:
         if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS) and self.blocks != -1:
             return True
         return False
 
-    def getGridPosFromPos(self, pos):
+    def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
         return x//BLOCKSIZE, y//BLOCKSIZE
     
-    def getBlockValue(self, x, y):
+    def getBlockValue(self, x: int, y: int) -> int:
         if self.checkBounds(x, y):
             return self.blocks[y][x]
 
-    def updateBlock(self, x, y, value):
+    def updateBlock(self, x: int, y: int, value: int) -> None:
         if self.checkBounds(x, y):
             self.blocks[y][x] = value
 
-    def updateParticleCounter(self, value):
+    def updateParticleCounter(self, value: int) -> None:
         self.particleCounter += value
 
 class Moves(Position):
-    def getMoves(self, startX, startY, depth=1):
+    def getMoves(self, startX: int, startY: int, depth: int=1) -> list[tuple()]:
         moves = []
 
         for x in range(-depth,depth+1):
@@ -58,7 +58,7 @@ class Moves(Position):
                     moves.append((x1, y1))
         return moves
     
-    def getBlockValuesFromPosList(self, pos):
+    def getBlockValuesFromPosList(self, pos: tuple) -> list[int]:
         values = []
         for x, y in pos:
             val = self.getBlockValue(x, y)
@@ -66,17 +66,17 @@ class Moves(Position):
                 values.append(val)
         return values
     
-    def getAverageForList(self, list):
+    def getAverageForList(self, list: list) -> int:
         return sum(list) / len(list)    
 
 class Diffusion(Moves):
-    def update(self, blocks):
+    def update(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
                 if block >= VISCOSITY:
                     self.updateBlocks(x, y)
 
-    def updateBlocks(self, x, y):
+    def updateBlocks(self, x: int, y: int) -> None:
         neighboursPos = self.getMoves(x, y, DEPTH)
         values = self.getBlockValuesFromPosList(neighboursPos)
         avg = self.getAverageForList(values)
@@ -85,7 +85,7 @@ class Diffusion(Moves):
                 self.updateBlock(x, y, avg)
 
 class Controls():
-    def createBlocks(self):
+    def createBlocks(self) -> None:
         for y in range(HEIGHTBLOCKS):
             tempX = []
             tempXRect = []
@@ -96,16 +96,16 @@ class Controls():
             self.blocks.append(tempX)
             self.blockRect.append(tempXRect)
 
-    def addParticle(self, mouse):
+    def addParticle(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.updateBlock(x, y, PARTICLESPERCLICK)
         self.updateParticleCounter(PARTICLESPERCLICK)
 
-    def addWall(self, mouse):
+    def addWall(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.updateBlock(x, y, -1)
 
-    def reset(self):
+    def reset(self) -> None:
         self.blocks = []
         self.blockRect = []
         self.particleCounter = 0
@@ -113,7 +113,7 @@ class Controls():
         self.createBlocks()
 
 class Grid(Render, Diffusion, Controls):
-    def __init__(self, surface):
+    def __init__(self, surface: pygame.surface.Surface) -> None:
         self.surface = surface
         self.size = BLOCKSIZE
 
@@ -123,8 +123,8 @@ class Grid(Render, Diffusion, Controls):
         self.particleCounter = 0
         self.createBlocks()
 
-    def render(self):
+    def render(self) -> None:
         self.renderGrid(self.blockRect, self.blocks)
 
-    def logic(self):
+    def logic(self) -> None:
         self.update(self.blocks)
