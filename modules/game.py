@@ -1,6 +1,6 @@
 
 import pygame
-from modules import FONT
+from modules.__config__ import FONT
 from modules.screen import Screen
 from modules.grid import Grid
 

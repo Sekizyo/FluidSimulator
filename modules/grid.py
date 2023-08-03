@@ -1,6 +1,6 @@
 import pygame
 
-from modules import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, VISCOSITY, PARTICLESPERCLICK
+from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, VISCOSITY, PARTICLESPERCLICK
 
 class Render():
     def renderGrid(self, blockRect: list[pygame.Rect], blocks: list[int]) -> None:

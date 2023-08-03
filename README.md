@@ -16,7 +16,7 @@ https://github.com/Sekizyo/FluidSimulator/assets/51287415/9d48df9b-d8b5-4b4b-9fc
     
 ### Configuration
 
-change in "__init__.py"
+change in "__config__.py"
 
     WIDTH = 1000 - Screen width
     HEIGHT = 1000 - Screen height
