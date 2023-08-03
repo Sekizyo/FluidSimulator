@@ -7,32 +7,36 @@ class Test_checkBounds():
         self.WIDTHBLOCKS = modules.__config__.WIDTHBLOCKS
         self.HEIGHTBLOCKS = modules.__config__.HEIGHTBLOCKS
 
-    def test_checkBounds(self):
+    def test_method(self):
         assert self.position.checkBounds(self.WIDTHBLOCKS-1, self.HEIGHTBLOCKS-1) == True
 
-    def test_checkBoundsOverScreen(self):
-        assert self.position.checkBounds(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS+1) == False
+    def test_ReturnValueTrue(self):
+        assert type(self.position.checkBounds(1, 1)) == bool
 
-    def test_checkBoundsOverScreenX(self):
-        assert self.position.checkBounds(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS) == False
-
-    def test_checkBoundsOverScreenY(self):
-        assert self.position.checkBounds(self.WIDTHBLOCKS, self.HEIGHTBLOCKS+1) == False
-
-    def test_checkBoundsUnderScreen(self):
+    def test_UnderBounds(self):
         assert self.position.checkBounds(-1, -1) == False
 
-    def test_checkBoundsUnderScreenX(self):
+    def test_UnderBoundsX(self):
         assert self.position.checkBounds(-1, self.HEIGHTBLOCKS-1) == False
 
-    def test_checkBoundsUnderScreenY(self):
+    def test_UnderBoundsY(self):
         assert self.position.checkBounds(self.WIDTHBLOCKS-1, -1) == False
+
+    def test_BeyondBounds(self):
+        assert self.position.checkBounds(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS+1) == False
+
+    def test_BeyondBoundsX(self):
+        assert self.position.checkBounds(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS) == False
+
+    def test_BeyondBoundsY(self):
+        assert self.position.checkBounds(self.WIDTHBLOCKS, self.HEIGHTBLOCKS+1) == False
+
 
 class Test_getGridPosFromPos():
     def setup_method(self):
         self.position = Position()
 
-    def test_getGridPosFromPos(self):
+    def test_method(self):
         sizeX, sizeY = self.position.getGridPosFromPos((0,0))
         assert sizeX == 0
         assert sizeY == 0
@@ -43,25 +47,25 @@ class Test_getBlockValue():
         self.WIDTHBLOCKS = modules.__config__.WIDTHBLOCKS
         self.HEIGHTBLOCKS = modules.__config__.HEIGHTBLOCKS
 
-    def test_getBlockValue(self):
+    def test_method(self):
         assert self.position.getBlockValue(0, 0) == 0 
 
-    def test_getBlockValueUnderBounds(self):
+    def test_UnderBounds(self):
         assert self.position.getBlockValue(-1, -1) == None 
 
-    def test_getBlockValueUnderBoundsX(self):
+    def test_UnderBoundsX(self):
         assert self.position.getBlockValue(-1, 0) == None 
 
-    def test_getBlockValueUnderBoundsY(self):
+    def test_UnderBoundsY(self):
         assert self.position.getBlockValue(0, -1) == None 
 
-    def test_getBlockValueOverBounds(self):
+    def test_BeyondBounds(self):
         assert self.position.getBlockValue(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS+1) == None 
 
-    def test_getBlockValueOverBoundsX(self):
+    def test_BeyondBoundsX(self):
         assert self.position.getBlockValue(self.WIDTHBLOCKS+1, 0) == None 
 
-    def test_getBlockValueOverBoundsY(self):
+    def test_BeyondBoundsY(self):
         assert self.position.getBlockValue(0, self.HEIGHTBLOCKS+1) == None 
 
 class Test_updateBlock():
@@ -70,15 +74,15 @@ class Test_updateBlock():
         self.WIDTHBLOCKS = modules.__config__.WIDTHBLOCKS
         self.HEIGHTBLOCKS = modules.__config__.HEIGHTBLOCKS
 
-    def test_updateBlock(self):
+    def test_method(self):
         self.position.updateBlock(0, 0, 1)
         assert self.position.blocks[0][0] == 1
 
-    def test_updateBlockWall(self):
+    def test_BlockWall(self):
         self.position.updateBlock(0, 0, -1)
         assert self.position.blocks[0][0] == -1
 
-    def test_updateBlockWhereIsWall(self):
+    def test_BlockWhereIsWall(self):
         self.position.blocks[0][0] = -1
         self.position.updateBlock(0, 0, 1)
 
@@ -90,10 +94,10 @@ class Test_updateParticleCounter():
         self.WIDTHBLOCKS = modules.__config__.WIDTHBLOCKS
         self.HEIGHTBLOCKS = modules.__config__.HEIGHTBLOCKS
 
-    def test_updateParticleCounter(self):
+    def test_method(self):
         self.position.updateParticleCounter(1)
         assert self.position.particleCounter == 1
 
-    def test_updateParticleCounterSubtraction(self):
+    def test_Subtraction(self):
         self.position.updateParticleCounter(-1)
         assert self.position.particleCounter == -1
