@@ -10,7 +10,7 @@ class Render():
 
         self.grid.render()
         self.updateFps()
-        self.updateParticleCount()
+        self.updateParticleCounter()
 
         pygame.display.flip()
 
@@ -19,8 +19,8 @@ class Render():
         fps_text = FONT.render(f"Fps: {fps}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
-    def updateParticleCount(self):
-        particleText = FONT.render(f"Particles: {str(self.grid.particleCount)}", 100, pygame.Color("coral"))
+    def updateParticleCounter(self):
+        particleText = FONT.render(f"Particles: {str(self.grid.particleCounter)}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
 class Logic():

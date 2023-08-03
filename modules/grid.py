@@ -33,11 +33,16 @@ class Position():
         x, y = pos
         return x//BLOCKSIZE, y//BLOCKSIZE
     
-    def getBlock(self, x, y):
-        try:
+    def getBlockValue(self, x, y):
+        if self.checkBounds(x, y):
             return self.blocks[y][x]
-        except:
-            return None
+
+    def updateBlock(self, x, y, value):
+        if self.checkBounds(x, y):
+            self.blocks[y][x] = value
+
+    def updateParticleCounter(self, value):
+        self.particleCounter += value
 
 class Moves(Position):
     def getMoves(self, startX, startY, depth=1):
@@ -53,12 +58,12 @@ class Moves(Position):
                     moves.append((x1, y1))
         return moves
     
-    def getValuesFromPos(self, pos):
+    def getBlockValuesFromPosList(self, pos):
         values = []
         for x, y in pos:
-            val = self.blocks[y][x]
+            val = self.getBlockValue(x, y)
             if val >= 0:
-                values.append(self.blocks[y][x])
+                values.append(val)
         return values
     
     def getAverageForList(self, list):
@@ -73,11 +78,11 @@ class Diffusion(Moves):
 
     def updateBlocks(self, x, y):
         neighboursPos = self.getMoves(x, y, DEPTH)
-        values = self.getValuesFromPos(neighboursPos)
+        values = self.getBlockValuesFromPosList(neighboursPos)
         avg = self.getAverageForList(values)
         for x, y in neighboursPos:
-            if self.blocks[y][x] != -1:
-                self.blocks[y][x] = avg
+            if self.getBlockValue(x, y) != -1:
+                self.updateBlock(x, y, avg)
 
 class Controls():
     def createBlocks(self):
@@ -93,17 +98,17 @@ class Controls():
 
     def addParticle(self, mouse):
         x, y = self.getGridPosFromPos(mouse)
-        self.blocks[y][x] += PARTICLESPERCLICK
-        self.particleCount += PARTICLESPERCLICK
+        self.updateBlock(x, y, PARTICLESPERCLICK)
+        self.updateParticleCounter(PARTICLESPERCLICK)
 
     def addWall(self, mouse):
         x, y = self.getGridPosFromPos(mouse)
-        self.blocks[y][x] = -1
+        self.updateBlock(x, y, -1)
 
     def reset(self):
         self.blocks = []
         self.blockRect = []
-        self.particleCount = 0
+        self.particleCounter = 0
 
         self.createBlocks()
 
@@ -115,7 +120,7 @@ class Grid(Render, Diffusion, Controls):
         self.blocks = []
         self.blockRect = []
         
-        self.particleCount = 0
+        self.particleCounter = 0
         self.createBlocks()
 
     def render(self):
