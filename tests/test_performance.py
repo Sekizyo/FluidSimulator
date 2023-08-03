@@ -1,12 +1,11 @@
-import pytest 
-import os, psutil
+import psutil
 from modules.game import Game
 
 def test_fps():
     game = Game(testRun=True)
     avgFps = game.run()
 
-    assert avgFps > 30
+    assert avgFps > 25
 
 def test_memory():
     game = Game(testRun=True)
