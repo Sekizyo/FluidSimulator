@@ -25,7 +25,7 @@ class Render():
 
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
-        if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS) and self.blocks != -1:
+        if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
             return True
         return False
 
@@ -38,7 +38,7 @@ class Position():
             return self.blocks[y][x]
 
     def updateBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y):
+        if self.checkBounds(x, y) and self.blocks[y][x] != -1:
             self.blocks[y][x] = value
 
     def updateParticleCounter(self, value: int) -> None:
