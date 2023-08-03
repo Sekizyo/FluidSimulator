@@ -58,7 +58,7 @@ class Moves(Position):
                     moves.append((x1, y1))
         return moves
     
-    def getBlockValuesFromPosList(self, pos: tuple) -> list[int]:
+    def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
         values = []
         for x, y in pos:
             val = self.getBlockValue(x, y)
@@ -66,8 +66,9 @@ class Moves(Position):
                 values.append(val)
         return values
     
-    def getAverageForList(self, list: list) -> int:
-        return sum(list) / len(list)    
+    def getAverageForList(self, list: list) -> float:
+        if list:
+            return sum(list) / len(list)    
 
 class Diffusion(Moves):
     def update(self, blocks: list[int]) -> None:
