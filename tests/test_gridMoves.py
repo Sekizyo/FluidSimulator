@@ -8,19 +8,15 @@ class Test_getMoves():
         self.HEIGHTBLOCKS = modules.__config__.HEIGHTBLOCKS
 
     def test_method(self):
-        value = self.moves.getMoves(0, 0, 1)
+        value = self.moves.getMoves(0, 0)
         assert value == [(0, 0), (0, 1), (1, 0)]
 
-    def test_Depth2(self):
-        value = self.moves.getMoves(0, 0, 2)
-        assert value == [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (2, 0)]
-
     def test_UnderBounds(self):
-        value = self.moves.getMoves(-1, -1, 1)
+        value = self.moves.getMoves(-1, -1)
         assert value == []
 
     def test_BeyondBounds(self):
-        value = self.moves.getMoves(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS+1, 1)
+        value = self.moves.getMoves(self.WIDTHBLOCKS+1, self.HEIGHTBLOCKS+1)
         assert value == []
 
 class Test_getBlockValuesFromPosList():

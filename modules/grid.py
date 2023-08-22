@@ -1,6 +1,6 @@
 import pygame
 
-from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, DEPTH, VISCOSITY, PARTICLESPERCLICK
+from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS,  VISCOSITY, PARTICLESPERCLICK
 
 class Render():
     def renderGrid(self, blockRect: list[pygame.Rect], blocks: list[int]) -> None:
@@ -27,7 +27,8 @@ class Position():
     def checkBounds(self, x: int, y: int) -> bool:
         if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
             return True
-        return False
+        else:
+            return False
 
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
@@ -45,19 +46,13 @@ class Position():
         self.particleCounter += value
 
 class Moves(Position):
-    def getMoves(self, startX: int, startY: int, depth: int=1) -> list[tuple()]:
-        moves = []
-
-        for x in range(-depth,depth+1):
-            Y = int((depth*depth-x*x)**0.5)
-            for y in range(-Y,Y+1):
-                x1 = x+startX
-                y1 = y+startY
-
-                if self.checkBounds(x1, y1):
-                    moves.append((x1, y1))
+    def getMoves(self, startX: int, startY: int) -> list[tuple()]:
+        moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
+        for x, y in moves.copy():
+            if not self.checkBounds(x, y):
+                moves.remove((x,y))
         return moves
-    
+
     def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
         values = []
         for x, y in pos:
@@ -78,7 +73,7 @@ class Diffusion(Moves):
                     self.updateBlocks(x, y)
 
     def updateBlocks(self, x: int, y: int) -> None:
-        neighboursPos = self.getMoves(x, y, DEPTH)
+        neighboursPos = self.getMoves(x, y)
         values = self.getBlockValuesFromPosList(neighboursPos)
         avg = self.getAverageForList(values)
         for x, y in neighboursPos:
