@@ -4,26 +4,21 @@ import numpy as np
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS,  VISCOSITY, PARTICLESPERCLICK
 
 class Render():
-    def renderGrid(self, blockRect: list[pygame.Rect], blocks: list[int]) -> None:
-        for y, col in enumerate(blockRect):
-            for x, rect in enumerate(col):
-                nparticles = blocks[y][x]
-                self.renderBlock(nparticles, rect)
+    def renderGrid(self, blocks: list[int]) -> None:
+        for y, col in enumerate(blocks):
+            for x, nparticles in enumerate(col):
+                self.renderBlock(x, y, nparticles)
 
-    def renderBlock(self, nparticles: int, rect: list[pygame.Rect]) -> None:
+    def renderBlock(self, x: int, y: int, nparticles: int) -> None:
+
+        self.blockRect.left = BLOCKSIZE*x
+        self.blockRect.top = BLOCKSIZE*y
+
         if nparticles >= 0:
-            color = self.getColor(nparticles)
-            pygame.draw.rect(self.surface, color, rect)
+            color = int(nparticles*255)
+            pygame.draw.rect(self.surface, (color, color, color), self.blockRect)
         else:
-            pygame.draw.rect(self.surface, [255, 0, 0], rect)
-
-    def getColor(self, nparticles: int) -> list[int]:
-        delta = nparticles
-        if delta > 255: 
-            return [255, 255, 255]
-        else:
-            return [delta, delta, delta]
-        
+            pygame.draw.rect(self.surface, [255, 0, 0], self.blockRect)
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
         if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
