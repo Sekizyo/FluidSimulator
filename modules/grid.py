@@ -53,7 +53,7 @@ class Mask(Position):
     def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
         values = []
         for x, y in pos:
-            val = self.getBlockValue(x, y)
+            val = self.blocks[y][x]
             if val >= 0:
                 values.append(val)
         return values
@@ -62,7 +62,7 @@ class Mask(Position):
         if list:
             return sum(list) / len(list)    
 
-class Diffusion(Moves):
+class Diffusion(Mask):
     def update(self, blocks: list[int]) -> None:
         for y, col in enumerate(blocks):
             for x, block in enumerate(col):
@@ -74,7 +74,7 @@ class Diffusion(Moves):
         values = self.getBlockValuesFromPosList(neighboursPos)
         avg = self.getAverageForList(values)
         for x, y in neighboursPos:
-            if self.getBlockValue(x, y) != -1:
+            if self.blocks[y][x] != -1:
                 self.updateBlock(x, y, avg)
 
 class Controls():
