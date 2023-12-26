@@ -1,7 +1,7 @@
 import pygame
 
 import numpy as np
-from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS,  VISCOSITY, PARTICLESPERCLICK
+from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, MASKSIZE, VISCOSITY, PARTICLESPERCLICK
 
 class Render():
     def renderGrid(self, blocks: list[int]) -> None:
@@ -38,12 +38,13 @@ class Position():
         self.particleCounter += value
 
 class Mask(Position):
-    def getMoves(self, startX: int, startY: int) -> list[tuple()]:
-        moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
-        for x, y in moves.copy():
-            if not self.checkBounds(x, y):
-                moves.remove((x,y))
-        return moves
+    def getMask(self, startX: int, startY: int) -> list[tuple()]:
+        x_coords = np.arange((-MASKSIZE // 2)+startX+1, (MASKSIZE // 2)+startX+1)
+        y_coords = np.arange((-MASKSIZE // 2)+startY+1, (MASKSIZE // 2)+startY+1)
+
+        X, Y = np.meshgrid(x_coords, y_coords)
+
+        return np.vstack((X.ravel(), Y.ravel())).T
 
     def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
         values = []
@@ -59,13 +60,13 @@ class Mask(Position):
 
 class Diffusion(Mask):
     def update(self, blocks: list[int]) -> None:
-        for y, col in enumerate(blocks):
-            for x, block in enumerate(col):
-                if block >= VISCOSITY:
+        for y in range(MASKSIZE, len(blocks)-MASKSIZE):
+            for x in range(MASKSIZE, len(blocks)-MASKSIZE):
+                if blocks[y][x] >= VISCOSITY:
                     self.updateBlocks(x, y)
 
     def updateBlocks(self, x: int, y: int) -> None:
-        neighboursPos = self.getMoves(x, y)
+        neighboursPos = self.getMask(x, y)
         values = self.getBlockValuesFromPosList(neighboursPos)
         avg = self.getAverageForList(values)
         for x, y in neighboursPos:
