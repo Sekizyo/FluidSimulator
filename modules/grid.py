@@ -1,5 +1,6 @@
 import pygame
 
+import numpy as np
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS,  VISCOSITY, PARTICLESPERCLICK
 
 class Render():
@@ -34,9 +35,6 @@ class Position():
         x, y = pos
         return x//BLOCKSIZE, y//BLOCKSIZE
     
-    def getBlockValue(self, x: int, y: int) -> int:
-        return self.blocks[y][x]
-
     def updateBlock(self, x: int, y: int, value: int) -> None:
         if self.checkBounds(x, y) and self.blocks[y][x] != -1:
             self.blocks[y][x] = value
@@ -44,7 +42,7 @@ class Position():
     def updateParticleCounter(self, value: int) -> None:
         self.particleCounter += value
 
-class Moves(Position):
+class Mask(Position):
     def getMoves(self, startX: int, startY: int) -> list[tuple()]:
         moves = [(startX, startY), (startX, startY+1), (startX, startY-1), (startX+1, startY), (startX-1, startY)]
         for x, y in moves.copy():
@@ -80,17 +78,6 @@ class Diffusion(Moves):
                 self.updateBlock(x, y, avg)
 
 class Controls():
-    def createBlocks(self) -> None:
-        for y in range(HEIGHTBLOCKS):
-            tempX = []
-            tempXRect = []
-            for x in range(WIDTHBLOCKS):
-                tempX.append(0)
-                tempXRect.append(pygame.Rect(x*self.size, y*self.size, self.size, self.size))
-                
-            self.blocks.append(tempX)
-            self.blockRect.append(tempXRect)
-
     def addParticle(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.updateBlock(x, y, PARTICLESPERCLICK)
@@ -101,25 +88,19 @@ class Controls():
         self.updateBlock(x, y, -1)
 
     def reset(self) -> None:
-        self.blocks = []
-        self.blockRect = []
+        self.blocks = np.zeros((HEIGHTBLOCKS, WIDTHBLOCKS))
         self.particleCounter = 0
-
-        self.createBlocks()
 
 class Grid(Render, Diffusion, Controls):
     def __init__(self, surface: pygame.surface.Surface) -> None:
         self.surface = surface
-        self.size = BLOCKSIZE
 
-        self.blocks = []
-        self.blockRect = []
-        
+        self.blocks = np.zeros((HEIGHTBLOCKS, WIDTHBLOCKS))
         self.particleCounter = 0
-        self.createBlocks()
+        self.blockRect = pygame.Rect(0, 0, BLOCKSIZE, BLOCKSIZE)
 
     def render(self) -> None:
-        self.renderGrid(self.blockRect, self.blocks)
+        self.renderGrid(self.blocks)
 
     def logic(self) -> None:
         self.update(self.blocks)
