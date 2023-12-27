@@ -10,15 +10,15 @@ class Render():
                 self.renderBlock(x, y, nparticles)
 
     def renderBlock(self, x: int, y: int, nparticles: int) -> None:
-
         self.blockRect.left = BLOCKSIZE*x
         self.blockRect.top = BLOCKSIZE*y
 
         if nparticles >= 0:
             color = int(nparticles*255)
+            if color > 255:
+                color = 255
             pygame.draw.rect(self.surface, (color, color, color), self.blockRect)
-        else:
-            pygame.draw.rect(self.surface, [255, 0, 0], self.blockRect)
+
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
         if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
