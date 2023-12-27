@@ -31,72 +31,61 @@ class Position():
         return x//BLOCKSIZE, y//BLOCKSIZE
     
     def updateBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y) and self.blocks[y][x] != -1:
-            self.blocks[y][x] = value
+        if self.checkBounds(x, y) and self.matrix[y][x] != -1:
+            self.matrix[y][x] = value
 
-    def updateParticleCounter(self, value: int) -> None:
-        self.particleCounter += value
+class Convolution:
+    def update(self, matrix):
+        input_height, input_width = matrix.shape
+        kernel_height, kernel_width = self.kernel.shape
 
-class Mask(Position):
-    def getMask(self, startX: int, startY: int) -> list[tuple()]:
-        x_coords = np.arange((-MASKSIZE // 2)+startX+1, (MASKSIZE // 2)+startX+1)
-        y_coords = np.arange((-MASKSIZE // 2)+startY+1, (MASKSIZE // 2)+startY+1)
+        output_height = input_height - kernel_height + 1
+        output_width = input_width - kernel_width + 1
 
-        X, Y = np.meshgrid(x_coords, y_coords)
+        output_matrix = np.zeros((output_height, output_width))
 
-        return np.vstack((X.ravel(), Y.ravel())).T
+        for i in range(output_height):
+            for j in range(output_width):
+                output_matrix[i, j] = np.sum(matrix[i:i+kernel_height, j:j+kernel_width] * self.kernel)
 
-    def getBlockValuesFromPosList(self, pos: list[tuple]) -> list[int]:
-        values = []
-        for x, y in pos:
-            val = self.blocks[y][x]
-            if val >= 0:
-                values.append(val)
-        return values
-    
-    def getAverageForList(self, list: list) -> float:
-        if list:
-            return sum(list) / len(list)    
+        return output_matrix
 
-class Diffusion(Mask):
-    def update(self, blocks: list[int]) -> None:
-        for y in range(MASKSIZE, len(blocks)-MASKSIZE):
-            for x in range(MASKSIZE, len(blocks)-MASKSIZE):
-                if blocks[y][x] >= VISCOSITY:
-                    self.updateBlocks(x, y)
-
-    def updateBlocks(self, x: int, y: int) -> None:
-        neighboursPos = self.getMask(x, y)
-        values = self.getBlockValuesFromPosList(neighboursPos)
-        avg = self.getAverageForList(values)
-        for x, y in neighboursPos:
-            if self.blocks[y][x] != -1:
-                self.updateBlock(x, y, avg)
-
-class Controls():
+class Controls(Position):
     def addParticle(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.updateBlock(x, y, PARTICLESPERCLICK)
-        self.updateParticleCounter(PARTICLESPERCLICK)
+        self.particleCounter += PARTICLESPERCLICK
 
     def addWall(self, mouse: tuple()) -> None:
         x, y = self.getGridPosFromPos(mouse)
         self.updateBlock(x, y, -1)
 
     def reset(self) -> None:
-        self.blocks = np.zeros((HEIGHTBLOCKS, WIDTHBLOCKS))
+        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
         self.particleCounter = 0
 
-class Grid(Render, Diffusion, Controls):
+class Grid(Convolution, Controls, Render):
     def __init__(self, surface: pygame.surface.Surface) -> None:
         self.surface = surface
 
-        self.blocks = np.zeros((HEIGHTBLOCKS, WIDTHBLOCKS))
+        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+        self.matrix[0][0] = 0.01
         self.particleCounter = 0
         self.blockRect = pygame.Rect(0, 0, BLOCKSIZE, BLOCKSIZE)
 
+        self.kernel = np.array([
+                    [1/16, 1/8, 1/16],
+                    [1/8, 1/4, 1/8],
+                    [1/16, 1/8, 1/16]
+                ])
+
     def render(self) -> None:
-        self.renderGrid(self.blocks)
+        self.renderGrid(self.matrix)
 
     def logic(self) -> None:
-        self.update(self.blocks)
+        initial_sum = self.matrix.sum()
+        padded_matrix = np.pad(self.matrix, ((1, 1), (1, 1)), mode='constant')
+        self.matrix = self.update(padded_matrix)
+
+        scaling_factor = initial_sum / self.matrix.sum()
+        self.matrix *= scaling_factor
