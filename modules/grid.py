@@ -1,7 +1,7 @@
 import pygame
 
 import numpy as np
-from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, MASKSIZE, VISCOSITY, PARTICLESPERCLICK
+from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
 
 class Render():
     def renderGrid(self, blocks: list[int]) -> None:
