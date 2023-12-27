@@ -18,24 +18,16 @@ https://github.com/Sekizyo/FluidSimulator/assets/51287415/9d48df9b-d8b5-4b4b-9fc
 
 change in "__config__.py"
 
-    WIDTH = 1000 - Screen width
-    HEIGHT = 1000 - Screen height
+    WIDTH = 800 #  - Screen width
+    HEIGHT = 800 #  - Screen height
 
-    BLOCKSIZE = 10 - Scale block size, it greatly influences prerformance. Optimal values: 8 - 25
+    BLOCKSIZE = 10 #  - Scale block size, it greatly influences performence. Optimal values: 10 - 25
 
-    DEPTH = 1 - How far particle can spread. Optimal values: 1-2 
-    VISCOSITY = 1 - its resistance to deformation at a given rate. Lower value more likely to spread. Optimal values: 1-100
-
-    PARTICLESPERCLICK = 10000 - Optimal values: depends on BLOCKSIZE
+    PARTICLESPERCLICK = 10
 
 ### Controls
+    ESC - exit
 
     Left mouse click - adds particles
 
-    Right mouse click - adds walls
-
-    R - resets screen
-
-### Known issues
-
-    When DEPTH is 2 or more, walls do not work
+    R - clears screen
