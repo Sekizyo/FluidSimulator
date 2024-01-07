@@ -70,7 +70,7 @@ class Game(Render, Logic, Tests):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 60
+        self.fps = 120
         self.avgFps = self.fps
         self.clock = pygame.time.Clock()
 

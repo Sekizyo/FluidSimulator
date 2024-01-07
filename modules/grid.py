@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
-from scipy import signal
+
+from scipy.signal import convolve2d
 from skimage.util.shape import view_as_windows
 
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK

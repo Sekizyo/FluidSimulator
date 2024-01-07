@@ -1,3 +1,4 @@
+import pytest
 import psutil
 from modules.game import Game
 
