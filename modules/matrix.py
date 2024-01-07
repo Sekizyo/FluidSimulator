@@ -2,11 +2,19 @@ import pygame
 import numpy as np
 
 from scipy.signal import convolve2d
-from skimage.util.shape import view_as_windows
 
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
 
 class Convolution():
+    def __init__(self):
+        super(Convolution, self).__init__()
+        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+        self.kernel = np.array([
+            [1/9, 1/9, 1/9],
+            [1/9, 1/9, 1/9],
+            [1/9, 1/9, 1/9]
+        ])
+
     def convolve(self, matrix):
         initial_sum = matrix.sum()
         if initial_sum == 0:
@@ -19,6 +27,10 @@ class Convolution():
         return convolved_matrix
 
 class Controls():
+    def __init__(self):
+        super(Controls, self).__init__()
+        self.particleCounter = 0
+
     def addParticle(self, mouse: tuple) -> None:
         x, y = self.getGridPosFromPos(mouse)
         if self.checkBounds(x, y):
@@ -49,18 +61,10 @@ class Render():
         colors_surface = pygame.surfarray.make_surface(colors)
         return pygame.transform.scale(colors_surface, (WIDTHBLOCKS * BLOCKSIZE, HEIGHTBLOCKS * BLOCKSIZE))
 
-class Grid(Convolution, Controls, Render):
+class Matrix(Convolution, Controls, Render):
     def __init__(self, surface: pygame.surface.Surface) -> None:
+        super(Matrix, self).__init__()
         self.surface = surface
-
-        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
-        self.particleCounter = 0
-
-        self.kernel = np.array([
-                    [1/9, 1/9, 1/9],
-                    [1/9, 1/9, 1/9],
-                    [1/9, 1/9, 1/9]
-                ])
 
     def render(self) -> None:
         self.renderGrid(self.matrix, self.surface)
