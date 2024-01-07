@@ -58,7 +58,7 @@ class Tests():
             self.testCounter += 1
             
             self.grid.addParticle((500,500))
-            if self.testCounter > 100:
+            if self.testCounter > 1000:
                 self.avgFps = self.avgFps//self.testCounter
                 self.kill()
 
@@ -70,7 +70,7 @@ class Game(Render, Logic, Tests):
         self.screen = Screen()
         self.grid = Grid(self.screen.surface)
 
-        self.fps = 120
+        self.fps = 200
         self.avgFps = self.fps
         self.clock = pygame.time.Clock()
 

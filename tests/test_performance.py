@@ -6,7 +6,7 @@ def test_fps():
     game = Game(testRun=True)
     avgFps = game.run()
 
-    assert avgFps > 60
+    assert avgFps > 200
 
 def test_memory():
     game = Game(testRun=True)
