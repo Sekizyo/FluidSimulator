@@ -27,7 +27,7 @@ class Position():
         return x//BLOCKSIZE, y//BLOCKSIZE
     
     def updateBlock(self, x: int, y: int, value: int) -> None:
-        if self.checkBounds(x, y) and self.matrix[y][x] != -1:
+        if self.checkBounds(x, y):
             self.matrix[y][x] = value
 
 class Convolution:
@@ -72,16 +72,12 @@ class Convolution:
         convolved_matrix *= scaling_factor
         return convolved_matrix
 
-
 class Controls(Position):
-    def addParticle(self, mouse: tuple()) -> None:
+    def addParticle(self, mouse: tuple) -> None:
         x, y = self.getGridPosFromPos(mouse)
-        self.updateBlock(x, y, PARTICLESPERCLICK)
-        self.particleCounter += PARTICLESPERCLICK
-
-    def addWall(self, mouse: tuple()) -> None:
-        x, y = self.getGridPosFromPos(mouse)
-        self.updateBlock(x, y, -1)
+        if self.checkBounds(x, y):
+            self.matrix[x, y] += PARTICLESPERCLICK
+            self.particleCounter += PARTICLESPERCLICK
 
     def reset(self) -> None:
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
@@ -103,7 +99,7 @@ class Grid(Convolution, Controls, Render):
                 ])
 
     def render(self) -> None:
-        self.renderGrid(self.matrix)
+        self.renderGrid(self.matrix, self.surface)
 
     def logic(self) -> None:
         self.matrix = self.convolve(self.matrix, WIDTHBLOCKS//2)
