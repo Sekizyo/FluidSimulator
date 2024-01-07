@@ -64,7 +64,7 @@ class Convolution:
     def updateSlice(self, matrix):
         initial_sum = matrix.sum()
         if initial_sum == 0:
-            matrix[0][0] = 0.001 
+            return matrix
 
         convolved_matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
         
