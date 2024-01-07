@@ -1,6 +1,8 @@
 import pygame
-
 import numpy as np
+from scipy import signal
+from skimage.util.shape import view_as_windows
+
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
 
 class Render():
@@ -35,20 +37,47 @@ class Position():
             self.matrix[y][x] = value
 
 class Convolution:
-    def update(self, matrix):
-        input_height, input_width = matrix.shape
-        kernel_height, kernel_width = self.kernel.shape
+    def convolve(self, matrix, block_size):
+        results = []
+        sliced_matrix = self.split_matrix(matrix, block_size)
+        
+        for row in range(len(sliced_matrix)):
+            for col in range(len(sliced_matrix[row])):
+                results.append(self.updateSlice(sliced_matrix[row][col]))
 
-        output_height = input_height - kernel_height + 1
-        output_width = input_width - kernel_width + 1
+        combined_array = self.concatenate(results[0], results[1], axis=1)
+        combined_array_2 = self.concatenate(results[2], results[3], axis=1)
+        final_combined_array = self.concatenate(combined_array, combined_array_2, axis=0)
 
-        output_matrix = np.zeros((output_height, output_width))
+        return final_combined_array
+    
+    def split_matrix(self, matrix, size):
+        return view_as_windows(matrix, (size, size), step=size)
+    
+    def concatenate(self, matrix1, matrix2, axis=0):
+        combinedArray = np.concatenate((matrix1, matrix2), axis=axis)
+        if axis == 0:
+            overlap = (matrix1[-1, :] + matrix2[0, :]) / 2  # Average overlapping rows
+            combinedArray[matrix1.shape[0] - 1, :] = overlap
+            combinedArray[matrix1.shape[0], :] = overlap
+        elif axis == 1:
+            overlap = (matrix1[:, -1] + matrix2[:, 0]) / 2  # Average overlapping columns
+            combinedArray[:, matrix1.shape[1] - 1] = overlap
+            combinedArray[:, matrix1.shape[1]] = overlap
 
-        for i in range(output_height):
-            for j in range(output_width):
-                output_matrix[i, j] = np.sum(matrix[i:i+kernel_height, j:j+kernel_width] * self.kernel)
+        return combinedArray
+    
+    def updateSlice(self, matrix):
+        initial_sum = matrix.sum()
+        if initial_sum == 0:
+            matrix[0][0] = 0.001 
 
-        return output_matrix
+        convolved_matrix = signal.convolve2d(matrix, self.kernel, mode='same', boundary='symm')
+        
+        scaling_factor = initial_sum / convolved_matrix.sum()
+        convolved_matrix *= scaling_factor
+        return convolved_matrix
+
 
 class Controls(Position):
     def addParticle(self, mouse: tuple()) -> None:
@@ -62,6 +91,7 @@ class Controls(Position):
 
     def reset(self) -> None:
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+        self.matrix[0][0] = 0.01
         self.particleCounter = 0
 
 class Grid(Convolution, Controls, Render):
@@ -69,23 +99,17 @@ class Grid(Convolution, Controls, Render):
         self.surface = surface
 
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
-        self.matrix[0][0] = 0.01
         self.particleCounter = 0
         self.blockRect = pygame.Rect(0, 0, BLOCKSIZE, BLOCKSIZE)
 
         self.kernel = np.array([
-                    [1/16, 1/8, 1/16],
-                    [1/8, 1/4, 1/8],
-                    [1/16, 1/8, 1/16]
+                    [1/9, 1/9, 1/9],
+                    [1/9, 1/9, 1/9],
+                    [1/9, 1/9, 1/9]
                 ])
 
     def render(self) -> None:
         self.renderGrid(self.matrix)
 
     def logic(self) -> None:
-        initial_sum = self.matrix.sum()
-        padded_matrix = np.pad(self.matrix, ((1, 1), (1, 1)), mode='constant')
-        self.matrix = self.update(padded_matrix)
-
-        scaling_factor = initial_sum / self.matrix.sum()
-        self.matrix *= scaling_factor
+        self.matrix = self.convolve(self.matrix, WIDTHBLOCKS//2)
