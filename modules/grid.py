@@ -6,20 +6,14 @@ from skimage.util.shape import view_as_windows
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
 
 class Render():
-    def renderGrid(self, blocks: list[int]) -> None:
-        for y, col in enumerate(blocks):
-            for x, nparticles in enumerate(col):
-                self.renderBlock(x, y, nparticles)
+    def renderGrid(self, blocks: np.ndarray, surface: pygame.Surface) -> None:
+        block_colors = self.generateBlockColors(blocks)
+        surface.blit(block_colors, (0, 0))
 
-    def renderBlock(self, x: int, y: int, nparticles: int) -> None:
-        self.blockRect.left = BLOCKSIZE*x
-        self.blockRect.top = BLOCKSIZE*y
-
-        if nparticles >= 0:
-            color = int(nparticles*255)
-            if color > 255:
-                color = 255
-            pygame.draw.rect(self.surface, (color, color, color), self.blockRect)
+    def generateBlockColors(self, blocks: np.ndarray) -> pygame.Surface:
+        colors = np.clip(blocks * 255, 0, 255).astype(np.uint8)
+        colors_surface = pygame.surfarray.make_surface(colors)
+        return pygame.transform.scale(colors_surface, (WIDTHBLOCKS * BLOCKSIZE, HEIGHTBLOCKS * BLOCKSIZE))
 
 class Position():
     def checkBounds(self, x: int, y: int) -> bool:
@@ -72,7 +66,7 @@ class Convolution:
         if initial_sum == 0:
             matrix[0][0] = 0.001 
 
-        convolved_matrix = signal.convolve2d(matrix, self.kernel, mode='same', boundary='symm')
+        convolved_matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
         
         scaling_factor = initial_sum / convolved_matrix.sum()
         convolved_matrix *= scaling_factor
