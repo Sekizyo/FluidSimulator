@@ -3,20 +3,16 @@ import numpy as np
 
 from scipy.signal import convolve2d
 
-from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
+from modules.__config__ import WIDTH, HEIGHT, WIDTHBLOCKS, HEIGHTBLOCKS, BLOCKSIZE, DECAYRATE, PARTICLESPERCLICK
 
-class Convolution():
+class Kernels():
     def __init__(self) -> None:
-        super(Convolution, self).__init__()
-        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
-
+        super(Kernels, self).__init__()
         self.kernel = np.array([
             [1/9, 1/9, 1/9],
             [1/9, 1/9, 1/9],
             [1/9, 1/9, 1/9]
         ])
-
-        self.decay_rate = 0.997
 
         # Sobel filter for different directions
         self.horizontal_kernel = np.array([
@@ -43,6 +39,12 @@ class Convolution():
             [0, -1, -2]
         ])
 
+class Convolution(Kernels):
+    def __init__(self) -> None:
+        super(Convolution, self).__init__()
+        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+        self.decayRate = DECAYRATE
+
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
         initialSum = matrix.sum()
         if initialSum == 0:
@@ -67,7 +69,7 @@ class Convolution():
     def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
         scaling_factor = initialSum / matrix.sum()
         matrix *= scaling_factor
-        matrix *= self.decay_rate
+        matrix *= self.decayRate
         
         return matrix
     
@@ -75,36 +77,40 @@ class Controls():
     def __init__(self) -> None:
         super(Controls, self).__init__()
         self.particleCounter = 0
+        self.particlesPerClick = PARTICLESPERCLICK
+        self.width = WIDTHBLOCKS
+        self.height = HEIGHTBLOCKS
+        self.blockSize = BLOCKSIZE
 
     def addParticle(self, mouse: tuple) -> None:
         x, y = self.getGridPosFromPos(mouse)
         if self.checkBounds(x, y):
-            self.matrix[x, y] += PARTICLESPERCLICK
-            self.particleCounter += PARTICLESPERCLICK
+            self.matrix[x, y] += self.particlesPerClick
+            self.particleCounter += self.particlesPerClick
 
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
-        return (x//BLOCKSIZE, y//BLOCKSIZE)
+        return (x//self.blockSize, y//self.blockSize)
     
     def checkBounds(self, x: int, y: int) -> bool:
-        if (0 <= x < WIDTHBLOCKS) and (0 <= y < HEIGHTBLOCKS):
+        if (0 <= x < self.width) and (0 <= y < self.height):
             return True
         else:
             return False
 
     def reset(self) -> None:
-        self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+        self.matrix = np.zeros((self.width, self.height))
         self.particleCounter = 0
 
 class Render():
     def renderGrid(self, blocks: np.ndarray, surface: pygame.Surface) -> None:
-        block_colors = self.generateBlockColors(blocks)
-        surface.blit(block_colors, (0, 0))
+        blocks = self.generateBlocks(blocks)
+        surface.blit(blocks, (0, 0))
 
-    def generateBlockColors(self, blocks: np.ndarray) -> pygame.Surface:
+    def generateBlocks(self, blocks: np.ndarray) -> pygame.Surface:
         colors = np.clip(blocks * 255, 0, 255).astype(np.uint8)
         colors_surface = pygame.surfarray.make_surface(colors)
-        return pygame.transform.scale(colors_surface, (WIDTHBLOCKS * BLOCKSIZE, HEIGHTBLOCKS * BLOCKSIZE))
+        return pygame.transform.scale(colors_surface, (WIDTH, HEIGHT))
 
 class Matrix(Convolution, Controls, Render):
     def __init__(self, surface: pygame.surface.Surface) -> None:

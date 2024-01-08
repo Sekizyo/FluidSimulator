@@ -1,6 +1,6 @@
 
 import pygame
-from modules.__config__ import FONT
+from modules.__config__ import FONT, MAXFPS
 from modules.screen import Screen
 from modules.matrix import Matrix
 
@@ -63,7 +63,7 @@ class Game(Render, Logic, Tests):
         self.screen = Screen()
         self.matrix = Matrix(self.screen.surface)
 
-        self.fps = 200
+        self.fps = MAXFPS
         self.clock = pygame.time.Clock()
         self.exit = False
 

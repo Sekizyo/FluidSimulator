@@ -1,13 +1,14 @@
 import pygame
 
-WIDTH = 1000 #  - Screen width
-HEIGHT = 1000 #  - Screen height
+FONT = pygame.font.SysFont("Arial", 18)
 
-BLOCKSIZE = 5 #  - Scale block size, it greatly influences prerformance. Optimal values: 8 - 25
-
-PARTICLESPERCLICK = 100 #  - Optimal values: depends on BLOCKSIZE
-
+WIDTH = 800 #  - Screen width
+HEIGHT = 800 #  - Screen height
+BLOCKSIZE = 5 #  - Scale block size, it greatly influences prerformance
 WIDTHBLOCKS = WIDTH//BLOCKSIZE
 HEIGHTBLOCKS = HEIGHT//BLOCKSIZE
 
-FONT = pygame.font.SysFont("Arial", 18)
+MAXFPS = 60
+DECAYRATE = 0.997
+PARTICLESPERCLICK = 100 #  - Optimal values: depends on BLOCKSIZE
+
