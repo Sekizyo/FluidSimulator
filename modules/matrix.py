@@ -6,7 +6,7 @@ from scipy.signal import convolve2d
 from modules.__config__ import BLOCKSIZE, WIDTHBLOCKS, HEIGHTBLOCKS, PARTICLESPERCLICK
 
 class Convolution():
-    def __init__(self):
+    def __init__(self) -> None:
         super(Convolution, self).__init__()
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
         self.kernel = np.array([
@@ -15,7 +15,7 @@ class Convolution():
             [1/9, 1/9, 1/9]
         ])
 
-    def convolve(self, matrix):
+    def convolve(self, matrix: np.ndarray) -> np.ndarray:
         initial_sum = matrix.sum()
         if initial_sum == 0:
             return matrix
@@ -27,7 +27,7 @@ class Convolution():
         return convolved_matrix
 
 class Controls():
-    def __init__(self):
+    def __init__(self) -> None:
         super(Controls, self).__init__()
         self.particleCounter = 0
 
