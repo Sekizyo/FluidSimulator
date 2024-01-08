@@ -9,23 +9,51 @@ class Convolution():
     def __init__(self) -> None:
         super(Convolution, self).__init__()
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
+
         self.kernel = np.array([
             [1/9, 1/9, 1/9],
             [1/9, 1/9, 1/9],
             [1/9, 1/9, 1/9]
         ])
 
+        # Sobel filter for horizontal and vertical edge detection
+        self.horizontal_kernel = np.array([
+            [-1, 0, 1],
+            [-2, 0, 2],
+            [-1, 0, 1]
+        ])
+
+        self.vertical_kernel = np.array([
+            [-1, -2, -1],
+            [0, 0, 0],
+            [1, 2, 1]
+        ])
+
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
-        initial_sum = matrix.sum()
-        if initial_sum == 0:
+        initialSum = matrix.sum()
+        if initialSum == 0:
             return matrix
 
         convolved_matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
-        
-        scaling_factor = initial_sum / convolved_matrix.sum()
-        convolved_matrix *= scaling_factor
-        return convolved_matrix
 
+        return self.scale(convolved_matrix, initialSum)
+    
+    def flow(self, matrix: np.ndarray) -> np.ndarray:
+        initialSum = matrix.sum()
+        if initialSum == 0:
+            return matrix
+
+        horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='symm')
+        vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='symm')
+        convolved_matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2)
+
+        return self.scale(convolved_matrix, initialSum)
+    
+    def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
+        scaling_factor = initialSum / matrix.sum()
+        matrix *= scaling_factor
+        return matrix
+    
 class Controls():
     def __init__(self) -> None:
         super(Controls, self).__init__()
@@ -71,3 +99,4 @@ class Matrix(Convolution, Controls, Render):
 
     def logic(self) -> None:
         self.matrix = self.convolve(self.matrix)
+        self.matrix = self.flow(self.matrix)
