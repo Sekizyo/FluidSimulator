@@ -16,7 +16,9 @@ class Convolution():
             [1/9, 1/9, 1/9]
         ])
 
-        # Sobel filter for horizontal and vertical edge detection
+        self.decay_rate = 0.997
+
+        # Sobel filter for different directions
         self.horizontal_kernel = np.array([
             [-1, 0, 1],
             [-2, 0, 2],
@@ -29,13 +31,24 @@ class Convolution():
             [1, 2, 1]
         ])
 
+        self.diagonal_kernel = np.array([
+            [0, 1, 2],
+            [-1, 0, 1],
+            [-2, -1, 0]
+        ])
+
+        self.antidiagonal_kernel = np.array([
+            [2, 1, 0],
+            [1, 0, -1],
+            [0, -1, -2]
+        ])
+
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
         initialSum = matrix.sum()
         if initialSum == 0:
             return matrix
 
         convolved_matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
-
         return self.scale(convolved_matrix, initialSum)
     
     def flow(self, matrix: np.ndarray) -> np.ndarray:
@@ -45,13 +58,17 @@ class Convolution():
 
         horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='symm')
         vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='symm')
-        convolved_matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2)
+        diagonal_conv = convolve2d(matrix, self.diagonal_kernel, mode='same', boundary='symm')
+        antidiagonal_conv = convolve2d(matrix, self.antidiagonal_kernel, mode='same', boundary='symm')
 
+        convolved_matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
         return self.scale(convolved_matrix, initialSum)
     
     def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
         scaling_factor = initialSum / matrix.sum()
         matrix *= scaling_factor
+        matrix *= self.decay_rate
+        
         return matrix
     
 class Controls():
