@@ -24,7 +24,8 @@ class Render():
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCounter(self) -> None:
-        particleText = self.font.render(f"Particles: {str(round(self.matrix.particleCounter, 4))}", 100, pygame.Color("coral"))
+        particles = str(self.matrix.particleCounter)
+        particleText = self.font.render(f"Particles: {particles}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
 class Logic():
