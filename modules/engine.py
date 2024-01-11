@@ -63,9 +63,9 @@ class Tests():
     def kill(self) -> None:
         self.exit = True
 
-class Game(Render, Logic, Tests):
+class Engine(Render, Logic, Tests):
     def __init__(self, testRun: bool=False) -> None:
-        super(Game, self).__init__()
+        super(Engine, self).__init__()
         self.screen = Screen()
         self.matrix = Matrix(self.screen.surface)
 
