@@ -1,10 +1,14 @@
 
 import pygame
-from modules.__config__ import FONT, MAXFPS
+from modules.__config__ import MAXFPS
 from modules.screen import Screen
 from modules.matrix import Matrix
 
 class Render():
+    def __init__(self) -> None:
+        super(Render, self).__init__()
+        self.font = pygame.font.SysFont("Arial", 18)
+
     def render(self) -> None:
         self.screen.surface.fill("black")
 
@@ -16,11 +20,11 @@ class Render():
 
     def updateFps(self) -> None:
         fps = str(int(self.clock.get_fps()))
-        fps_text = FONT.render(f"Fps: {fps}", 100, pygame.Color("coral"))
+        fps_text = self.font.render(f"Fps: {fps}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
 
     def updateParticleCounter(self) -> None:
-        particleText = FONT.render(f"Particles: {str(round(self.matrix.particleCounter, 4))}", 100, pygame.Color("coral"))
+        particleText = self.font.render(f"Particles: {str(round(self.matrix.particleCounter, 4))}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
 class Logic():
@@ -60,6 +64,7 @@ class Tests():
 
 class Game(Render, Logic, Tests):
     def __init__(self, testRun: bool=False) -> None:
+        super(Game, self).__init__()
         self.screen = Screen()
         self.matrix = Matrix(self.screen.surface)
 
