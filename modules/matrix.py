@@ -120,6 +120,6 @@ class Matrix(Convolution, Controls, Render):
     def render(self) -> None:
         self.renderGrid(self.matrix, self.surface)
 
-    def logic(self) -> None:
+    def update(self) -> None:
         self.matrix = self.convolve(self.matrix)
         self.matrix = self.flow(self.matrix)

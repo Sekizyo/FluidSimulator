@@ -1,5 +1,6 @@
 
 import pygame
+
 from modules.__config__ import MAXFPS
 from modules.screen import Screen
 from modules.matrix import Matrix
@@ -29,11 +30,11 @@ class Render():
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
 class Logic():
-    def logic(self) -> None:
+    def update(self) -> None:
         self.controlsKeyboard()
         self.controlsMouse()
 
-        self.matrix.logic()
+        self.matrix.update()
 
     def controlsKeyboard(self) -> None:
         for event in pygame.event.get():
@@ -82,7 +83,7 @@ class Engine(Render, Logic, Tests):
             self.clock.tick(self.fps)
             self.testRun(self.isTestRun)
 
-            self.logic()
+            self.update()
             self.render()
 
         return self.avgFps
