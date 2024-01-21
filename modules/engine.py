@@ -14,9 +14,10 @@ class Render():
         self.screen.surface.fill("black")
 
         self.matrix.render()
-        self.updateFps()
-        self.updateParticleCounter()
-        self.updatePauseNotification()
+        if not self.hudHidden:
+            self.updateFps()
+            self.updateParticleCounter()
+            self.updatePauseNotification()
 
         pygame.display.flip()
 
@@ -46,14 +47,18 @@ class Logic():
             if event.type == pygame.QUIT:
                 self.exit = True
 
-        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-            self.exit = True
-        if pygame.key.get_pressed()[pygame.K_r]:
-            self.matrix.reset()
-        if pygame.key.get_pressed()[pygame.K_p]:
-            self.paused = True
-        if pygame.key.get_pressed()[pygame.K_u]:
-            self.paused = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.exit = True
+                
+                if event.key == pygame.K_r:
+                    self.matrix.reset()
+                
+                if event.key == pygame.K_i:
+                    self.hudHidden = not self.hudHidden
+
+                if event.key == pygame.K_p:
+                    self.paused = not self.paused
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
@@ -82,6 +87,7 @@ class Engine(Render, Logic, Tests):
         self.fps = MAXFPS
         self.clock = pygame.time.Clock()
         self.paused = False
+        self.hudHidden = False
         self.exit = False
 
         self.isTestRun = testRun

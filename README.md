@@ -32,6 +32,6 @@ change in "__config__.py"
 
     R - clears screen
 
-    P - pause
+    P - pause/unpause
 
-    U - unpause
+    I - show/hide hud
