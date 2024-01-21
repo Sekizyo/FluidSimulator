@@ -31,3 +31,7 @@ change in "__config__.py"
     Left mouse click - adds particles
 
     R - clears screen
+
+    P - pause
+
+    U - unpause

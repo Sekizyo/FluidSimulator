@@ -16,6 +16,7 @@ class Render():
         self.matrix.render()
         self.updateFps()
         self.updateParticleCounter()
+        self.updatePauseNotification()
 
         pygame.display.flip()
 
@@ -28,13 +29,17 @@ class Render():
         particles = str(self.matrix.particleCounter)
         particleText = self.font.render(f"Particles: {particles}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
+    
+    def updatePauseNotification(self) -> None:
+        particleText = self.font.render(f"Pause: {self.paused}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, particleText, (10,25))
 
 class Logic():
     def update(self) -> None:
         self.controlsKeyboard()
         self.controlsMouse()
-
-        self.matrix.update()
+        if not self.paused:
+            self.matrix.update()
 
     def controlsKeyboard(self) -> None:
         for event in pygame.event.get():
@@ -45,6 +50,10 @@ class Logic():
             self.exit = True
         if pygame.key.get_pressed()[pygame.K_r]:
             self.matrix.reset()
+        if pygame.key.get_pressed()[pygame.K_p]:
+            self.paused = True
+        if pygame.key.get_pressed()[pygame.K_u]:
+            self.paused = False
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
@@ -72,6 +81,7 @@ class Engine(Render, Logic, Tests):
 
         self.fps = MAXFPS
         self.clock = pygame.time.Clock()
+        self.paused = False
         self.exit = False
 
         self.isTestRun = testRun
