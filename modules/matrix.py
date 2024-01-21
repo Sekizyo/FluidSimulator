@@ -46,23 +46,23 @@ class Convolution(Kernels):
         self.decayRate = DECAYRATE
 
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
-        matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
+        matrix = convolve2d(matrix, self.kernel, mode='same', boundary='wrap')
         
         return matrix
     
     def flow(self, matrix: np.ndarray) -> np.ndarray:
-        horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='symm')
-        vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='symm')
-        diagonal_conv = convolve2d(matrix, self.diagonal_kernel, mode='same', boundary='symm')
-        antidiagonal_conv = convolve2d(matrix, self.antidiagonal_kernel, mode='same', boundary='symm')
+        horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='wrap')
+        vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='wrap')
+        diagonal_conv = convolve2d(matrix, self.diagonal_kernel, mode='same', boundary='wrap')
+        antidiagonal_conv = convolve2d(matrix, self.antidiagonal_kernel, mode='same', boundary='wrap')
 
         matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
         
         return matrix
     
     def flow2(self, matrix: np.ndarray) -> np.ndarray:
-        velocity_coefficient = 0.2  # Adjust this coefficient based on your model
-        pressure_coefficient = 0.4  # Adjust this coefficient based on your model
+        velocity_coefficient = 0.4  # Adjust this coefficient based on your model
+        pressure_coefficient = 0.7  # Adjust this coefficient based on your model
 
         velocity_matrix = np.sqrt(matrix) * velocity_coefficient
         pressure_matrix = matrix * pressure_coefficient
@@ -71,7 +71,7 @@ class Convolution(Kernels):
         matrix += pressure_matrix.astype(float)
 
         return matrix
-            
+    
     def decay(self, matrix: np.ndarray) -> np.ndarray:
         return matrix * self.decayRate
 
@@ -138,6 +138,6 @@ class Matrix(Convolution, Controls, Render):
         matrix = self.flow(matrix)
         matrix = self.flow2(matrix)
         matrix = self.convolve(matrix)
-        matrix = self.decay(matrix)
 
+        matrix = self.decay(matrix)
         self.matrix = self.scale(matrix, initialSum)
