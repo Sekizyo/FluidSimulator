@@ -46,31 +46,21 @@ class Convolution(Kernels):
         self.decayRate = DECAYRATE
 
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
-        initialSum = matrix.sum()
-        if initialSum == 0:
-            return matrix
-
-        convolved_matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
-        return self.scale(convolved_matrix, initialSum)
+        matrix = convolve2d(matrix, self.kernel, mode='same', boundary='symm')
+        
+        return matrix
     
     def flow(self, matrix: np.ndarray) -> np.ndarray:
-        initialSum = matrix.sum()
-        if initialSum == 0:
-            return matrix
-
         horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='symm')
         vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='symm')
         diagonal_conv = convolve2d(matrix, self.diagonal_kernel, mode='same', boundary='symm')
         antidiagonal_conv = convolve2d(matrix, self.antidiagonal_kernel, mode='same', boundary='symm')
 
-        convolved_matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
-        return self.scale(convolved_matrix, initialSum)
+        matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
+        
+        return matrix
     
     def flow2(self, matrix: np.ndarray) -> np.ndarray:
-        initialSum = matrix.sum()
-        if initialSum == 0:
-            return matrix
-        
         velocity_coefficient = 0.2  # Adjust this coefficient based on your model
         pressure_coefficient = 0.4  # Adjust this coefficient based on your model
 
@@ -78,15 +68,16 @@ class Convolution(Kernels):
         pressure_matrix = matrix * pressure_coefficient
 
         matrix += velocity_matrix.astype(float)
-
         matrix += pressure_matrix.astype(float)
 
-        return self.scale(matrix, initialSum)
+        return matrix
             
+    def decay(self, matrix: np.ndarray) -> np.ndarray:
+        return matrix * self.decayRate
+
     def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
         scaling_factor = initialSum / matrix.sum()
         matrix *= scaling_factor
-        matrix *= self.decayRate
         
         return matrix
     
@@ -138,6 +129,15 @@ class Matrix(Convolution, Controls, Render):
         self.renderGrid(self.matrix, self.surface)
 
     def update(self) -> None:
-        self.matrix = self.flow(self.matrix)
-        self.matrix = self.flow2(self.matrix)
-        self.matrix = self.convolve(self.matrix)
+        matrix = self.matrix
+
+        initialSum = matrix.sum()
+        if initialSum == 0:
+            return
+        
+        matrix = self.flow(matrix)
+        matrix = self.flow2(matrix)
+        matrix = self.convolve(matrix)
+        matrix = self.decay(matrix)
+
+        self.matrix = self.scale(matrix, initialSum)
