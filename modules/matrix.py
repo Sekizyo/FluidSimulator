@@ -66,6 +66,23 @@ class Convolution(Kernels):
         convolved_matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
         return self.scale(convolved_matrix, initialSum)
     
+    def flow2(self, matrix: np.ndarray) -> np.ndarray:
+        initialSum = matrix.sum()
+        if initialSum == 0:
+            return matrix
+        
+        velocity_coefficient = 0.2  # Adjust this coefficient based on your model
+        pressure_coefficient = 0.4  # Adjust this coefficient based on your model
+
+        velocity_matrix = np.sqrt(matrix) * velocity_coefficient
+        pressure_matrix = matrix * pressure_coefficient
+
+        matrix += velocity_matrix.astype(float)
+
+        matrix += pressure_matrix.astype(float)
+
+        return self.scale(matrix, initialSum)
+            
     def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
         scaling_factor = initialSum / matrix.sum()
         matrix *= scaling_factor
@@ -121,5 +138,6 @@ class Matrix(Convolution, Controls, Render):
         self.renderGrid(self.matrix, self.surface)
 
     def update(self) -> None:
-        self.matrix = self.convolve(self.matrix)
         self.matrix = self.flow(self.matrix)
+        self.matrix = self.flow2(self.matrix)
+        self.matrix = self.convolve(self.matrix)
