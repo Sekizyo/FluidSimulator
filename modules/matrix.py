@@ -27,17 +27,6 @@ class Kernels():
             [1, 2, 1]
         ])
 
-        self.diagonal_kernel = np.array([
-            [0, 1, 2],
-            [-1, 0, 1],
-            [-2, -1, 0]
-        ])
-
-        self.antidiagonal_kernel = np.array([
-            [2, 1, 0],
-            [1, 0, -1],
-            [0, -1, -2]
-        ])
 
 class Convolution(Kernels):
     def __init__(self) -> None:
@@ -70,12 +59,9 @@ class Convolution(Kernels):
     def decay(self, matrix: np.ndarray) -> np.ndarray:
         return matrix * self.decayRate
     
-    def scale(self, matrix: np.ndarray) -> np.ndarray:
-        if matrix.sum() == 0:
-            return matrix
-        
-        norm = np.linalg.norm(matrix)
-        matrix = matrix / norm
+    def scale(self, matrix: np.ndarray, initSum: float) -> np.ndarray:
+        scaling_factor = initSum / matrix.sum()
+        matrix *= scaling_factor
         return matrix
 
 class Controls():
@@ -128,9 +114,13 @@ class Matrix(Convolution, Controls, Render):
     def update(self) -> None:
         matrix = self.matrix
 
+        initSum = matrix.sum()
+        if initSum == 0:
+            return
+
         matrix = self.flow(matrix)
         matrix = self.flow2(matrix)
         matrix = self.convolve(matrix)
-
         matrix = self.decay(matrix)
-        self.matrix = self.scale(matrix)
+
+        self.matrix = self.scale(matrix, initSum)
