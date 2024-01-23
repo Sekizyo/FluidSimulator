@@ -45,7 +45,7 @@ class Convolution(Kernels):
         return matrix
     
     def flow2(self, matrix: np.ndarray) -> np.ndarray:
-        velocity_coefficient = 0.05  # Adjust this coefficient based on your model
+        velocity_coefficient = 0.1  # Adjust this coefficient based on your model
         pressure_coefficient = 0.9  # Adjust this coefficient based on your model
 
         velocity_matrix = np.sqrt(matrix) * velocity_coefficient
