@@ -46,23 +46,18 @@ class Convolution(Kernels):
         self.decayRate = DECAYRATE
 
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
-        matrix = convolve2d(matrix, self.kernel, mode='same', boundary='wrap')
-        
-        return matrix
+        return convolve2d(matrix, self.kernel, mode='same', boundary='wrap')
     
     def flow(self, matrix: np.ndarray) -> np.ndarray:
         horizontal_conv = convolve2d(matrix, self.horizontal_kernel, mode='same', boundary='wrap')
         vertical_conv = convolve2d(matrix, self.vertical_kernel, mode='same', boundary='wrap')
-        diagonal_conv = convolve2d(matrix, self.diagonal_kernel, mode='same', boundary='wrap')
-        antidiagonal_conv = convolve2d(matrix, self.antidiagonal_kernel, mode='same', boundary='wrap')
-
-        matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2 + diagonal_conv**2 + antidiagonal_conv**2)
+        matrix = np.sqrt(horizontal_conv**2 + vertical_conv**2)
         
         return matrix
     
     def flow2(self, matrix: np.ndarray) -> np.ndarray:
-        velocity_coefficient = 0.4  # Adjust this coefficient based on your model
-        pressure_coefficient = 0.7  # Adjust this coefficient based on your model
+        velocity_coefficient = 0.05  # Adjust this coefficient based on your model
+        pressure_coefficient = 0.9  # Adjust this coefficient based on your model
 
         velocity_matrix = np.sqrt(matrix) * velocity_coefficient
         pressure_matrix = matrix * pressure_coefficient
@@ -74,13 +69,15 @@ class Convolution(Kernels):
     
     def decay(self, matrix: np.ndarray) -> np.ndarray:
         return matrix * self.decayRate
-
-    def scale(self, matrix: np.ndarray, initialSum: float) -> np.ndarray:
-        scaling_factor = initialSum / matrix.sum()
-        matrix *= scaling_factor
-        
-        return matrix
     
+    def scale(self, matrix: np.ndarray) -> np.ndarray:
+        if matrix.sum() == 0:
+            return matrix
+        
+        norm = np.linalg.norm(matrix)
+        matrix = matrix / norm
+        return matrix
+
 class Controls():
     def __init__(self) -> None:
         super(Controls, self).__init__()
@@ -131,13 +128,9 @@ class Matrix(Convolution, Controls, Render):
     def update(self) -> None:
         matrix = self.matrix
 
-        initialSum = matrix.sum()
-        if initialSum == 0:
-            return
-        
         matrix = self.flow(matrix)
         matrix = self.flow2(matrix)
         matrix = self.convolve(matrix)
 
         matrix = self.decay(matrix)
-        self.matrix = self.scale(matrix, initialSum)
+        self.matrix = self.scale(matrix)
