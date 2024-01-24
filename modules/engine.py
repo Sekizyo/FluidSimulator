@@ -19,35 +19,47 @@ class Render():
         if not self.hudHidden:
             self.updateFps()
             self.updateParticleCounter()
+            self.updateMatrixMass()
             self.updatePressureCoeff()
             self.updateVelocityCoeff()
+            self.updateDecayRate()
             self.updatePauseNotification()
 
         pygame.display.flip()
 
     def updateFps(self) -> None:
         fps = str(int(self.clock.get_fps()))
-        fps_text = self.font.render(f"Fps: {fps}", 100, pygame.Color("coral"))
-        pygame.Surface.blit(self.screen.surface, fps_text, (10,0))
+        fpsText = self.font.render(f"Fps: {fps}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, fpsText, (10,0))
 
     def updateParticleCounter(self) -> None:
         particles = str(self.matrix.particleCounter)
         particleText = self.font.render(f"Particles: {particles}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
+    def updateMatrixMass(self) -> None:
+        mass = str(round(self.matrix.matrix.sum(), 1))
+        massText = self.font.render(f"Mass: {mass}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, massText, (180,0))
+
     def updatePressureCoeff(self) -> None:
         pressure = str(round(self.matrix.pressureCoeff, 1))
-        pressureText = self.font.render(f"PressureCoeff: {pressure}", 100, pygame.Color("coral"))
+        pressureText = self.font.render(f"Pressure: {pressure}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, pressureText, (10, 50))
 
     def updateVelocityCoeff(self) -> None:
         velocity = str(round(self.matrix.velocityCoeff, 1))
-        velocityText = self.font.render(f"VelocityCoeff: {velocity}", 100, pygame.Color("coral"))
+        velocityText = self.font.render(f"Velocity: {velocity}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, velocityText, (10, 75))
+
+    def updateDecayRate(self) -> None:
+        rate = str(round(self.matrix.decayRate, 1))
+        rateText = self.font.render(f"Decay: {rate}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, rateText, (10, 100))
     
     def updatePauseNotification(self) -> None:
         particleText = self.font.render(f"Pause: {self.paused}", 100, pygame.Color("coral"))
-        pygame.Surface.blit(self.screen.surface, particleText, (10,25))
+        pygame.Surface.blit(self.screen.surface, particleText, (10,125))
 
 class Logic():
     def update(self) -> None:
@@ -88,6 +100,12 @@ class Logic():
 
                 if event.key == pygame.K_h:
                     self.matrix.decreasePreassureCoeff()
+
+                if event.key == pygame.K_u:
+                    self.matrix.increaseDecayRate()
+
+                if event.key == pygame.K_j:
+                    self.matrix.decreaseDecayRate()
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:

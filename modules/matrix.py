@@ -102,6 +102,16 @@ class Controls():
         if newVelocity >= 0:
             self.velocityCoeff= newVelocity
 
+    def increaseDecayRate(self) -> None:
+        newRate = self.decayRate + 0.1
+        if newRate <= 1:
+            self.decayRate = newRate
+
+    def decreaseDecayRate(self) -> None:
+        newRate = self.decayRate - 0.1
+        if newRate >= 0:
+            self.decayRate = newRate
+        
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
         return (x//self.blockSize, y//self.blockSize)
@@ -118,6 +128,7 @@ class Controls():
         self.isRain = False
         self.velocityCoeff = VELOCITYCOEFF
         self.pressureCoeff = PRESSURECOEFF
+        self.decayRate = DECAYRATE
 
 class Render():
     def renderGrid(self, blocks: np.ndarray, surface: pygame.Surface) -> None:
