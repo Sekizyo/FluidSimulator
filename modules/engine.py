@@ -9,6 +9,8 @@ class Render():
     def __init__(self) -> None:
         super(Render, self).__init__()
         self.font = pygame.font.SysFont("Arial", 18)
+        self.paused = False
+        self.hudHidden = False
 
     def render(self) -> None:
         self.screen.surface.fill("black")
@@ -67,9 +69,14 @@ class Logic():
         if pygame.mouse.get_pressed()[0]:
             self.matrix.addParticle(pygame.mouse.get_pos())
 
-class Tests():
-    def testRun(self, test=False) -> None:
-        if test:
+class Test():
+    def __init__(self):
+        super(Test, self).__init__()
+        self.avgFps = 0
+        self.testCounter = 0
+
+    def runTest(self) -> None:
+        if self.isTestRun:
             self.avgFps += self.clock.get_fps() 
             self.testCounter += 1
             
@@ -81,26 +88,21 @@ class Tests():
     def kill(self) -> None:
         self.exit = True
 
-class Engine(Render, Logic, Tests):
-    def __init__(self, testRun: bool=False) -> None:
+class Engine(Render, Logic, Test):
+    def __init__(self, isTestRun: bool=False) -> None:
         super(Engine, self).__init__()
         self.screen = Screen()
         self.matrix = Matrix(self.screen.surface)
 
         self.fps = MAXFPS
         self.clock = pygame.time.Clock()
-        self.paused = False
-        self.hudHidden = False
+        self.isTestRun = isTestRun
         self.exit = False
-
-        self.isTestRun = testRun
-        self.avgFps = self.fps
-        self.testCounter = 0
 
     def run(self) -> int:
         while not self.exit:
             self.clock.tick(self.fps)
-            self.testRun(self.isTestRun)
+            self.runTest()
 
             self.update()
             self.render()
