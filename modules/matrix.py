@@ -28,7 +28,6 @@ class Kernels():
             [1, 2, 1]
         ])
 
-
 class Convolution(Kernels):
     def __init__(self) -> None:
         super(Convolution, self).__init__()
@@ -55,7 +54,8 @@ class Convolution(Kernels):
         return matrix
     
     def decay(self, matrix: np.ndarray) -> np.ndarray:
-        return matrix * self.decayRate
+        matrix *= self.decayRate
+        return matrix 
     
     def scale(self, matrix: np.ndarray, initSum: float) -> np.ndarray:
         scaling_factor = initSum / matrix.sum()
@@ -150,8 +150,8 @@ class Matrix(Convolution, Controls, Render):
 
     def update(self) -> None:
         matrix = self.matrix
-
         self.rain()
+
         initSum = matrix.sum()
         if initSum == 0:
             return
