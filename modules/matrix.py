@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+from random import randint
 
 from scipy.signal import convolve2d
 
@@ -33,6 +34,8 @@ class Convolution(Kernels):
         super(Convolution, self).__init__()
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
         self.decayRate = DECAYRATE
+        self.velocityCoeff = 0.1
+        self.pressureCoeff = 0.9
 
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
         return convolve2d(matrix, self.kernel, mode='same', boundary='wrap')
@@ -45,11 +48,8 @@ class Convolution(Kernels):
         return matrix
     
     def flow2(self, matrix: np.ndarray) -> np.ndarray:
-        velocity_coefficient = 0.1  # Adjust this coefficient based on your model
-        pressure_coefficient = 0.9  # Adjust this coefficient based on your model
-
-        velocity_matrix = np.sqrt(matrix) * velocity_coefficient
-        pressure_matrix = matrix * pressure_coefficient
+        velocity_matrix = np.sqrt(matrix) * self.velocityCoeff 
+        pressure_matrix = matrix * self.pressureCoeff
         matrix = np.sqrt(velocity_matrix**2 + pressure_matrix**2)
 
         return matrix
@@ -70,12 +70,17 @@ class Controls():
         self.width = WIDTHBLOCKS
         self.height = HEIGHTBLOCKS
         self.blockSize = BLOCKSIZE
+        self.isRain = False
 
     def addParticle(self, mouse: tuple) -> None:
         x, y = self.getGridPosFromPos(mouse)
         if self.checkBounds(x, y):
             self.matrix[x, y] += self.particlesPerClick
             self.particleCounter += self.particlesPerClick
+
+    def rain(self) -> None:
+        if self.isRain:
+            self.addParticle((randint(0, self.width), randint(0, self.height)))
 
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
@@ -90,6 +95,7 @@ class Controls():
     def reset(self) -> None:
         self.matrix = np.zeros((self.width, self.height))
         self.particleCounter = 0
+        self.isRain = False
 
 class Render():
     def renderGrid(self, blocks: np.ndarray, surface: pygame.Surface) -> None:
@@ -112,6 +118,7 @@ class Matrix(Convolution, Controls, Render):
     def update(self) -> None:
         matrix = self.matrix
 
+        self.rain()
         initSum = matrix.sum()
         if initSum == 0:
             return

@@ -1,6 +1,6 @@
 
 import pygame
-from random import randint
+
 from modules.__config__ import MAXFPS
 from modules.screen import Screen
 from modules.matrix import Matrix
@@ -42,9 +42,6 @@ class Logic():
         if not self.paused:
             self.matrix.update()
 
-        if self.rain:
-            self.matrix.addParticle((randint(50, 750), randint(50, 750)))
-
     def controlsKeyboard(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -64,7 +61,7 @@ class Logic():
                     self.paused = not self.paused
 
                 if event.key == pygame.K_w:
-                    self.rain = not self.rain
+                    self.matrix.isRain = not self.matrix.isRain
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
@@ -92,7 +89,6 @@ class Engine(Render, Logic, Tests):
 
         self.fps = MAXFPS
         self.clock = pygame.time.Clock()
-        self.rain = False
         self.paused = False
         self.hudHidden = False
         self.exit = False
