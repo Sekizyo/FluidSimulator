@@ -4,7 +4,7 @@ from random import randint
 
 from scipy.signal import convolve2d
 
-from modules.__config__ import WIDTH, HEIGHT, WIDTHBLOCKS, HEIGHTBLOCKS, BLOCKSIZE, DECAYRATE, PARTICLESPERCLICK
+from modules.__config__ import WIDTH, HEIGHT, WIDTHBLOCKS, HEIGHTBLOCKS, BLOCKSIZE, DECAYRATE, PARTICLESPERCLICK, VELOCITYCOEFF, PRESSURECOEFF
 
 class Kernels():
     def __init__(self) -> None:
@@ -34,8 +34,8 @@ class Convolution(Kernels):
         super(Convolution, self).__init__()
         self.matrix = np.zeros((WIDTHBLOCKS, HEIGHTBLOCKS))
         self.decayRate = DECAYRATE
-        self.velocityCoeff = 0.1
-        self.pressureCoeff = 0.9
+        self.velocityCoeff = VELOCITYCOEFF
+        self.pressureCoeff = PRESSURECOEFF
 
     def convolve(self, matrix: np.ndarray) -> np.ndarray:
         return convolve2d(matrix, self.kernel, mode='same', boundary='wrap')
@@ -82,6 +82,26 @@ class Controls():
         if self.isRain:
             self.addParticle((randint(0, self.width), randint(0, self.height)))
 
+    def increasePreassureCoeff(self) -> None:
+        newPressure = self.pressureCoeff + 0.1
+        if newPressure <= 1:
+            self.pressureCoeff = newPressure
+
+    def decreasePreassureCoeff(self) -> None:
+        newPressure = self.pressureCoeff - 0.1
+        if newPressure >= 0:
+            self.pressureCoeff = newPressure
+
+    def increaseVelocityCoeff(self) -> None:
+        newVelocity = self.velocityCoeff + 0.1
+        if newVelocity <= 1:
+            self.velocityCoeff= newVelocity
+
+    def decreaseVelocityCoeff(self) -> None:
+        newVelocity = self.velocityCoeff - 0.1
+        if newVelocity >= 0:
+            self.velocityCoeff= newVelocity
+
     def getGridPosFromPos(self, pos: tuple) -> int:
         x, y = pos
         return (x//self.blockSize, y//self.blockSize)
@@ -96,6 +116,8 @@ class Controls():
         self.matrix = np.zeros((self.width, self.height))
         self.particleCounter = 0
         self.isRain = False
+        self.velocityCoeff = VELOCITYCOEFF
+        self.pressureCoeff = PRESSURECOEFF
 
 class Render():
     def renderGrid(self, blocks: np.ndarray, surface: pygame.Surface) -> None:

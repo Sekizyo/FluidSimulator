@@ -19,6 +19,8 @@ class Render():
         if not self.hudHidden:
             self.updateFps()
             self.updateParticleCounter()
+            self.updatePressureCoeff()
+            self.updateVelocityCoeff()
             self.updatePauseNotification()
 
         pygame.display.flip()
@@ -32,6 +34,16 @@ class Render():
         particles = str(self.matrix.particleCounter)
         particleText = self.font.render(f"Particles: {particles}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
+
+    def updatePressureCoeff(self) -> None:
+        pressure = str(round(self.matrix.pressureCoeff, 1))
+        pressureText = self.font.render(f"PressureCoeff: {pressure}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, pressureText, (10, 50))
+
+    def updateVelocityCoeff(self) -> None:
+        velocity = str(round(self.matrix.velocityCoeff, 1))
+        velocityText = self.font.render(f"VelocityCoeff: {velocity}", 100, pygame.Color("coral"))
+        pygame.Surface.blit(self.screen.surface, velocityText, (10, 75))
     
     def updatePauseNotification(self) -> None:
         particleText = self.font.render(f"Pause: {self.paused}", 100, pygame.Color("coral"))
@@ -64,6 +76,18 @@ class Logic():
 
                 if event.key == pygame.K_w:
                     self.matrix.isRain = not self.matrix.isRain
+
+                if event.key == pygame.K_t:
+                    self.matrix.increaseVelocityCoeff()
+
+                if event.key == pygame.K_g:
+                    self.matrix.decreaseVelocityCoeff()
+
+                if event.key == pygame.K_y:
+                    self.matrix.increasePreassureCoeff()
+
+                if event.key == pygame.K_h:
+                    self.matrix.decreasePreassureCoeff()
 
     def controlsMouse(self) -> None:
         if pygame.mouse.get_pressed()[0]:
