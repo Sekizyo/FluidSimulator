@@ -80,7 +80,7 @@ class Controls():
 
     def rain(self) -> None:
         if self.isRain:
-            self.addParticle((randint(0, self.width), randint(0, self.height)))
+            self.addParticle((randint(0, WIDTH), randint(0, HEIGHT)))
 
     def increasePreassureCoeff(self) -> None:
         newPressure = self.pressureCoeff + 0.1
