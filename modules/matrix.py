@@ -50,9 +50,7 @@ class Convolution(Kernels):
 
         velocity_matrix = np.sqrt(matrix) * velocity_coefficient
         pressure_matrix = matrix * pressure_coefficient
-
-        matrix += velocity_matrix.astype(float)
-        matrix += pressure_matrix.astype(float)
+        matrix = np.sqrt(velocity_matrix**2 + pressure_matrix**2)
 
         return matrix
     
@@ -121,6 +119,6 @@ class Matrix(Convolution, Controls, Render):
         matrix = self.flow(matrix)
         matrix = self.flow2(matrix)
         matrix = self.convolve(matrix)
-        matrix = self.decay(matrix)
 
         self.matrix = self.scale(matrix, initSum)
+        matrix = self.decay(matrix)
