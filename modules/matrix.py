@@ -71,6 +71,8 @@ class Controls():
         self.height = HEIGHTBLOCKS
         self.blockSize = BLOCKSIZE
         self.isRain = False
+        self.changeAmount = 0.1
+        self.changeAmounDecayRate = 0.001
 
     def addParticle(self, mouse: tuple) -> None:
         x, y = self.getGridPosFromPos(mouse)
@@ -83,32 +85,32 @@ class Controls():
             self.addParticle((randint(0, WIDTH), randint(0, HEIGHT)))
 
     def increasePreassureCoeff(self) -> None:
-        newPressure = self.pressureCoeff + 0.1
+        newPressure = self.pressureCoeff + self.changeAmount
         if newPressure <= 1:
             self.pressureCoeff = newPressure
 
     def decreasePreassureCoeff(self) -> None:
-        newPressure = self.pressureCoeff - 0.1
+        newPressure = self.pressureCoeff - self.changeAmount
         if newPressure >= 0:
             self.pressureCoeff = newPressure
 
     def increaseVelocityCoeff(self) -> None:
-        newVelocity = self.velocityCoeff + 0.1
+        newVelocity = self.velocityCoeff + self.changeAmount
         if newVelocity <= 1:
-            self.velocityCoeff= newVelocity
+            self.velocityCoeff = newVelocity
 
     def decreaseVelocityCoeff(self) -> None:
-        newVelocity = self.velocityCoeff - 0.1
+        newVelocity = self.velocityCoeff - self.changeAmount
         if newVelocity >= 0:
-            self.velocityCoeff= newVelocity
+            self.velocityCoeff = newVelocity
 
     def increaseDecayRate(self) -> None:
-        newRate = self.decayRate + 0.1
+        newRate = self.decayRate + self.changeAmounDecayRate
         if newRate <= 1:
             self.decayRate = newRate
 
     def decreaseDecayRate(self) -> None:
-        newRate = self.decayRate - 0.1
+        newRate = self.decayRate - self.changeAmounDecayRate
         if newRate >= 0:
             self.decayRate = newRate
         

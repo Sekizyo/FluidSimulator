@@ -38,22 +38,22 @@ class Render():
         pygame.Surface.blit(self.screen.surface, particleText, (80,0))
 
     def updateMatrixMass(self) -> None:
-        mass = str(round(self.matrix.matrix.sum(), 1))
+        mass = str(round(self.matrix.matrix.sum(), 2))
         massText = self.font.render(f"Mass: {mass}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, massText, (180,0))
 
     def updatePressureCoeff(self) -> None:
-        pressure = str(round(self.matrix.pressureCoeff, 1))
+        pressure = str(round(self.matrix.pressureCoeff, 2))
         pressureText = self.font.render(f"Pressure: {pressure}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, pressureText, (10, 50))
 
     def updateVelocityCoeff(self) -> None:
-        velocity = str(round(self.matrix.velocityCoeff, 1))
+        velocity = str(round(self.matrix.velocityCoeff, 2))
         velocityText = self.font.render(f"Velocity: {velocity}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, velocityText, (10, 75))
 
     def updateDecayRate(self) -> None:
-        rate = str(round(self.matrix.decayRate, 1))
+        rate = str(round(self.matrix.decayRate, 3))
         rateText = self.font.render(f"Decay: {rate}", 100, pygame.Color("coral"))
         pygame.Surface.blit(self.screen.surface, rateText, (10, 100))
     
