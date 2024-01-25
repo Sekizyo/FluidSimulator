@@ -30,8 +30,23 @@ change in "__config__.py"
 
     Left mouse click - adds particles
 
+    W - adds rain droplets
+
     R - clears screen
 
     P - pause/unpause
 
     I - show/hide hud
+    
+    T - increase velocity coefficient
+
+    G - decrease velocity coefficient 
+
+    Y - increase pressure coefficient
+
+    H - decrease pressure coefficient 
+
+    U - increase decay rate
+
+    J - decrease decay rate 
+
