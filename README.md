@@ -1,13 +1,10 @@
 
 ### Demo
 
+https://github.com/Sekizyo/FluidSimulator/blob/Master/recources/fluid-mechanics0.mp4
 
+https://github.com/Sekizyo/FluidSimulator/blob/Master/recources/fluid-mechanics1.mp4
 
-https://github.com/Sekizyo/FluidSimulator/assets/51287415/5b80bfac-e5a3-4c82-82d2-dcae9dd18863
-
-
-
-https://github.com/Sekizyo/FluidSimulator/assets/51287415/9d48df9b-d8b5-4b4b-9fc8-d2fa283b5eb6
 
 
 ### How to use
